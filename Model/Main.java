@@ -16,9 +16,13 @@ public class Main extends SimModelImpl {
 	private int gridWidth;
 	private int gridHeight;
 	private int agentNumber;
-	private int minorityNumber;
-	private int majorityNumber;
+	private int ethnicNumber;
+	private int nativeNumber;
 	private int period;
+	
+	//private int lambda;
+	//private int beta;
+	//private int alpha;
 
 
     private DataRecorder data1;
@@ -56,8 +60,8 @@ public class Main extends SimModelImpl {
 		gridWidth = 50;
 		gridHeight = 50;
 		agentNumber = (int) (gridWidth * gridHeight * 0.8);
-		minorityNumber = (int)(agentNumber * 0.3);
-		majorityNumber = agentNumber - minorityNumber;
+		ethnicNumber = (int)(agentNumber * 0.3);
+		nativeNumber = agentNumber - ethnicNumber;
 		schedule = new Schedule(1);
 		
 		
@@ -68,10 +72,10 @@ public class Main extends SimModelImpl {
 		Grid = new Object2DGrid(gridWidth, gridHeight);
 		
 		//randomly allocate the minority
-		for (int id = 0; id < minorityNumber; id ++) {
+		for (int id = 0; id < ethnicNumber; id ++) {
 			Agent ag = new Agent();
 			ag.setID(id);
-			//Race 1 refers to majority and 2 refers to minority
+			//Race 1 refers to native and 2 refers to ethnic
 			ag.setRace(2);
 			
 			double x_i =  Math.random();//Entrepreneurial spirit/ability
@@ -91,7 +95,26 @@ public class Main extends SimModelImpl {
 			}
 			
 			Grid.putObjectAt(randomX, randomY, ag);
+			
+			//Allocate agents uniform randomly to initial occupations, all workers will unemployed and entrepreneurs will have no employees yet.
+			double random = Math.random();
+			//String occupation;
+			if (random < 1.0/3) {
+				ag.setcurOccupation("Entreperneur");
+				
+			}
+			else if(1.0/3 <= random && random < 2.0/3){
+				ag.setcurOccupation("Unemployed");
+				ag.setswitchOccupation("Work in Native Firm");
+				
+			}
+			else {
+				ag.setcurOccupation("Unemployed");
+				ag.setswitchOccupation("Work in  Ethnic Firm");
+				
+			}
 	
+			
 			ag.setCoordinate(new int[] {randomX, randomY});
 			ag.setEntrepreneurialAbility(x_i);
 			ag.setCostofAssimulation(c_i);
@@ -99,11 +122,14 @@ public class Main extends SimModelImpl {
 			ag.setWealthToBusiness(b_i);
 			agentList.add(ag);
 			
+			
+			
+			
 		}
 		
 		
-		//randomly allocate the majority
-		for (int id = minorityNumber; id < majorityNumber; id++) {
+		//randomly allocate the native
+		for (int id = ethnicNumber; id < nativeNumber; id++) {
 			Agent ag = new Agent();
 			ag.setID(id);
 			//Race 1 refers to majority
@@ -122,6 +148,20 @@ public class Main extends SimModelImpl {
 			
 			Grid.putObjectAt(randomX, randomY, ag);
 			
+			
+			//Allocate agents uniform randomly to initial occupations, all workers will unemployed and entrepreneurs will have no employees yet.
+			double random = Math.random();
+			//String occupation;
+			if (random < 1.0/2) {
+				ag.setcurOccupation("Entreperneur");
+				
+			}
+			else {
+				ag.setcurOccupation("Unemployed");
+				ag.setswitchOccupation("Work in  Native Firm");
+				
+			}
+			
 			ag.setCoordinate(new int[] {randomX, randomY});
 			ag.setEntrepreneurialAbility(x_i);
 			ag.setCostofAssimulation(c_i);
@@ -130,6 +170,38 @@ public class Main extends SimModelImpl {
 			agentList.add(ag);
 			
 		}
+	}
+	
+	
+	public String considerOccupation(){
+		
+		//first compute the payoff, then use the payoff to compute the utility
+		//use the utility to decide the occupation
+		//return "Work in Native Firm", "Work in  Ethnic Firm" , "Entrepreneur" or "unemployed"
+		//is the βEE Heterogeneous? what about the outside option B, interest rate r?
+		
+		return "";
+		
+	}
+	
+	public double computeEntrepreneurPayoff(Agent agent) {
+		
+		return 0.0;
+		
+	}
+	
+	public double computeNativeworkerPayoff(Agent agent) {
+		return 0.0;
+		
+	}
+	
+	public double computeEthnicworkerPayoff(Agent agent) {
+		return 0.0;
+		
+	}
+	public double computeUnemployedPayoff(Agent agent) {
+		return 0.0;
+		
 	}
 
 	

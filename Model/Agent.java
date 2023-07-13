@@ -4,7 +4,8 @@ public class Agent {
     private int id;
     private int race;
     private int[] coordinate;
-    private String occupation;
+    private String cur_occupation;
+    private String swicth_occupation;
 
 
     private double x_i;  //Entrepreneurial spirit/ability
@@ -39,12 +40,19 @@ public class Agent {
         return coordinate;
     }
 
-    public void setOccupation(String occupation) {
-        this.occupation = occupation;
+    public void setcurOccupation(String cur_occupation) {
+        this.cur_occupation = cur_occupation;
     }
 
-    public String getOccupation() {
-        return occupation;
+    public String getcurtOccupation() {
+        return cur_occupation;
+    }
+    public void setswitchOccupation(String swicth_occupation) {
+        this.swicth_occupation = swicth_occupation;
+    }
+
+    public String getswitchcurtOccupation() {
+        return swicth_occupation;
     }
 
 
