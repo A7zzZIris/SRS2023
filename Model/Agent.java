@@ -50,7 +50,7 @@ public class Agent {
 	}
 	
 	
-	public void setEntrepreneurialAbility(int ability) {
+	public void setEntrepreneurialAbility(double ability) {
 		this.x_i = ability;
 	}
 	

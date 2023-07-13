@@ -15,6 +15,8 @@ public class Main extends SimModelImpl {
 	private int gridWidth;
 	private int gridHeight;
 	private int agentNumber;
+	private int minorityNumber;
+	private int majorityNumber;
 	private int period;
 
 	private DataRecorder data1;
@@ -47,10 +49,12 @@ public class Main extends SimModelImpl {
 	public void setup() {
 		// TODO Auto-generated method stub
 		agentList = new ArrayList<Agent>();
-		agentNumber = 100;
 		period = 1000;
-		gridWidth = 40;
-		gridHeight = 40;
+		gridWidth = 50;
+		gridHeight = 50;
+		agentNumber = (int) (gridWidth * gridHeight * 0.8);
+		minorityNumber = (int)(agentNumber * 0.3);
+		majorityNumber = agentNumber - minorityNumber;
 		schedule = new Schedule(1);
 		
 		
@@ -59,42 +63,69 @@ public class Main extends SimModelImpl {
 	public void buildModel() {
 		
 		Grid = new Object2DGrid(gridWidth, gridHeight);
-
-		for (int id = 0; id < agentNumber; id++) {
+		
+		//randomly allocate the minority
+		for (int id = 0; id < minorityNumber; id ++) {
 			Agent ag = new Agent();
 			ag.setID(id);
-			
 			//Race 1 refers to majority and 2 refers to minority
-			int race = (int) (Math.random() * 2) + 1;
-			ag.setRace(race);
-			if (race == 1) {
-				int randomX = (int) (Math.random() * gridWidth); // random X
-				int randomY = (int) (Math.random() * gridHeight); // random Y
-				while (Grid.getObjectAt(randomX, randomY) != null) {
-					randomX = (int) (Math.random() * gridWidth);
-					randomY = (int) (Math.random() * gridHeight);
-				}
-				
-				Grid.putObjectAt(randomX, randomY, ag);
-				ag.setCoordinate(new int[] {randomX, randomY});
+			ag.setRace(2);
+			
+			double x_i =  Math.random();//Entrepreneurial spirit/ability
+			double c_i = Math.random(); //Cost of assimilation
+			double p_i = Math.random(); //Productivity as a worker
+			double b_i = Math.random(); //Wealth used to be starting a business
+			
+			//ethnic minorities will be located in the lower third of the lattice.
+			int min = (int) (gridHeight*(1.0/3.0)); 
+			int max = gridHeight; 
+			int randomY = (int) (Math.random() * (max - min + 1)) + min;
+			int randomX = (int) (Math.random() * gridWidth); 
+			
+			while (Grid.getObjectAt(randomX, randomY) != null) {
+				randomY = (int) (Math.random() * (max - min + 1)) + min;
+				randomX = (int) (Math.random() * gridWidth); 
 			}
-			else {
-				//ethnic minorities will be located in the lower third of the lattice.
-				int min = (int) (gridHeight*(1.0/3.0)); 
-				int max = gridHeight; 
-				int randomY = (int) (Math.random() * (max - min + 1)) + min;
-				int randomX = (int) (Math.random() * gridWidth); 
-				
-				while (Grid.getObjectAt(randomX, randomY) != null) {
-					randomY = (int) (Math.random() * (max - min + 1)) + min;
-					randomX = (int) (Math.random() * gridWidth); 
-				}
-				Grid.putObjectAt(randomX, randomY, ag);
-				ag.setCoordinate(new int[] {randomX, randomY});
-			}
+			
+			Grid.putObjectAt(randomX, randomY, ag);
+	
+			ag.setCoordinate(new int[] {randomX, randomY});
+			ag.setEntrepreneurialAbility(x_i);
+			ag.setCostofAssimulation(c_i);
+			ag.setProductivity(p_i);
+			ag.setWealthToBusiness(b_i);
 			agentList.add(ag);
 			
-
+		}
+		
+		
+		//randomly allocate the majority
+		for (int id = minorityNumber; id < majorityNumber; id++) {
+			Agent ag = new Agent();
+			ag.setID(id);
+			//Race 1 refers to majority
+			ag.setRace(1);
+			
+			double x_i =  Math.random();//Entrepreneurial spirit/ability
+			double c_i = Math.random(); //Cost of assimilation
+			double p_i = Math.random(); //Productivity as a worker
+			double b_i = Math.random(); //Wealth used to be starting a business
+			int randomX = (int) (Math.random() * gridWidth); // random X
+			int randomY = (int) (Math.random() * gridHeight); // random Y
+			while (Grid.getObjectAt(randomX, randomY) != null) {
+				randomX = (int) (Math.random() * gridWidth);
+				randomY = (int) (Math.random() * gridHeight);
+			}
+			
+			Grid.putObjectAt(randomX, randomY, ag);
+			
+			ag.setCoordinate(new int[] {randomX, randomY});
+			ag.setEntrepreneurialAbility(x_i);
+			ag.setCostofAssimulation(c_i);
+			ag.setProductivity(p_i);
+			ag.setWealthToBusiness(b_i);
+			agentList.add(ag);
+			
 		}
 	}
 }
