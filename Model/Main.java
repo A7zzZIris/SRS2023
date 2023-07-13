@@ -1,4 +1,4 @@
-package Model;
+package SRS2023.Model;
 
 import java.util.ArrayList;
 
