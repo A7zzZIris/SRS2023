@@ -8,6 +8,7 @@ import uchicago.src.sim.engine.SimModelImpl;
 import uchicago.src.sim.space.Object2DGrid;
 
 public class Main extends SimModelImpl {
+
 	private ArrayList<Agent> agentList;
 	// private ArrayList agentList = new ArrayList<Agent>();
 	private Schedule schedule;
@@ -19,31 +20,33 @@ public class Main extends SimModelImpl {
 	private int majorityNumber;
 	private int period;
 
-	private DataRecorder data1;
 
-	@Override
-	public void begin() {
-		// TODO Auto-generated method stub
-		
-	}
+    private DataRecorder data1;
 
-	@Override
-	public String[] getInitParam() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public void begin() {
+        // TODO Auto-generated method stub
 
-	@Override
-	public String getName() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    }
 
-	@Override
+    @Override
+    public String[] getInitParam() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    @Override
 	public Schedule getSchedule() {
 		// TODO Auto-generated method stub
-		return schedule;
+		return null;
 	}
+
 
 	@Override
 	public void setup() {
@@ -128,4 +131,8 @@ public class Main extends SimModelImpl {
 			
 		}
 	}
+
+	
+
+   
 }
