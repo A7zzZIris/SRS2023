@@ -1,4 +1,4 @@
-package Model;
+package SRS2023.Model;
 
 import java.util.ArrayList;
 
@@ -15,7 +15,7 @@ public class Main extends SimModelImpl {
 	private Object2DGrid Grid;
 	private int gridWidth;
 	private int gridHeight;
-	private int agentNumber;
+	private int numAgents;
 	private int ethnicNumber;
 	private int nativeNumber;
 	private int period;
@@ -34,15 +34,14 @@ public class Main extends SimModelImpl {
     }
 
     @Override
-    public String[] getInitParam() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	public String[] getInitParam() {
+		return new String[]{"gridWidth", "gridHeight", "numAgents", "period"};
+	}
 
     @Override
     public String getName() {
         // TODO Auto-generated method stub
-        return null;
+        return "Entrepreneurship Model";
     }
     
     @Override
@@ -59,9 +58,9 @@ public class Main extends SimModelImpl {
 		period = 1000;
 		gridWidth = 50;
 		gridHeight = 50;
-		agentNumber = (int) (gridWidth * gridHeight * 0.8);
-		ethnicNumber = (int)(agentNumber * 0.3);
-		nativeNumber = agentNumber - ethnicNumber;
+		numAgents = (int) (gridWidth * gridHeight * 0.8);
+		ethnicNumber = (int)(numAgents * 0.3);
+		nativeNumber = numAgents - ethnicNumber;
 		schedule = new Schedule(1);
 		
 		
@@ -204,7 +203,37 @@ public class Main extends SimModelImpl {
 		
 	}
 
-	
+	public int getGridHeight() {
+		return gridHeight;
+	}
+
+	public void setGridHeight(int n) {
+		this.gridHeight = n;
+	}
+
+	public int getGridWidth() {
+		return gridWidth;
+	}
+
+	public void setGridWidth(int n) {
+		this.gridWidth = n;
+	}
+
+	public int getPeriod() {
+		return period;
+	}
+
+	public void setPeriod(int period) {
+		this.period = period;
+	}
+
+	public int getNumAgents() {
+		return numAgents;
+	}
+
+	public void setNumAgents(int numAgents) {
+		this.numAgents = numAgents;
+	}
 
    
 }
