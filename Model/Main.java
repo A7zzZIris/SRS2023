@@ -1,5 +1,6 @@
 package Model;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 
 import uchicago.src.sim.analysis.DataRecorder;
@@ -108,6 +109,8 @@ public class Main extends SimModelImpl {
 			//Allocate agents uniform randomly to initial occupations, all workers will unemployed and entrepreneurs will have no employees yet.
 			double random = Math.random();
 			//String occupation;
+			//Occupation 1 is "Entrepreneur", 2 is "Work in Native Firm", 3 is "Work in  Ethnic Firm", 4 is "unemployed"
+			//gonna change this one after max change the agent class
 			if (random < 1.0/3) {
 				ag.setcurOccupation("Entrepreneur");
 				
@@ -181,14 +184,37 @@ public class Main extends SimModelImpl {
 	}
 	
 	
-	public String considerOccupation(){
+	public int considerOccupation(Agent agent){
 		
 		//first compute the payoff, then use the payoff to compute the utility
 		//use the utility to decide the occupation
 		//return "Work in Native Firm", "Work in  Ethnic Firm" , "Entrepreneur" or "unemployed"
 		//is the βEE Heterogeneous? what about the outside option B, interest rate r?
 		
-		return "";
+		double payoff1 = computeEntrepreneurUtility(computeEntrepreneurPayoff(agent), p);
+		double payoff2 = computeNativeworkerUtility(computeNativeworkerPayoff(agent), p);
+		double payoff3 = computeEthnicworkerUtility(computeEthnicworkerPayoff(agent), p);
+		double payoff4 = computeUnemployedUtility(computeUnemployedPayoff(agent), p);
+		
+		
+		//missing a condition: payoff is the same
+		double[] numbers = {payoff1, payoff2, payoff3, payoff4};
+		double max = Arrays.stream(numbers).max().getAsDouble();
+		if (max == payoff1) {
+			return 1;
+		}
+		
+		else if (max == payoff2) {
+			return 2;
+			
+		}
+		else if (max == payoff3) {
+			return 3;
+			
+		}
+		else {
+			return 4;
+		}
 		
 	}
 	
