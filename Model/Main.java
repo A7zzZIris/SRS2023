@@ -25,7 +25,7 @@ public class Main extends SimModelImpl {
 	private double unemployment;
 	private double r; //interest rate
 	private double B; //outside option
-	private double p; //price
+	private double pE; //price of ethnic good
 	
 	private int betaNE;
 	private int betaEE;
@@ -186,15 +186,10 @@ public class Main extends SimModelImpl {
 	
 	public int considerOccupation(Agent agent){
 		
-		//first compute the payoff, then use the payoff to compute the utility
-		//use the utility to decide the occupation
-		//return "Work in Native Firm", "Work in  Ethnic Firm" , "Entrepreneur" or "unemployed"
-		//is the βEE Heterogeneous? what about the outside option B, interest rate r?
-		
-		double payoff1 = computeEntrepreneurUtility(computeEntrepreneurPayoff(agent), p);
-		double payoff2 = computeNativeworkerUtility(computeNativeworkerPayoff(agent), p);
-		double payoff3 = computeEthnicworkerUtility(computeEthnicworkerPayoff(agent), p);
-		double payoff4 = computeUnemployedUtility(computeUnemployedPayoff(agent), p);
+		double payoff1 = computeEntrepreneurUtility(computeEntrepreneurPayoff(agent), pE);
+		double payoff2 = computeNativeworkerUtility(computeNativeworkerPayoff(agent), pE);
+		double payoff3 = computeEthnicworkerUtility(computeEthnicworkerPayoff(agent), pE);
+		double payoff4 = computeUnemployedUtility(computeUnemployedPayoff(agent), pE);
 		
 		
 		//missing a condition: payoff is the same
@@ -203,14 +198,11 @@ public class Main extends SimModelImpl {
 		if (max == payoff1) {
 			return 1;
 		}
-		
 		else if (max == payoff2) {
 			return 2;
-			
 		}
 		else if (max == payoff3) {
 			return 3;
-			
 		}
 		else {
 			return 4;
