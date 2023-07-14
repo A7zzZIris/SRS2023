@@ -22,11 +22,16 @@ public class Main extends SimModelImpl {
 	private int period;
 	private double occupancy;
 	private double unemployment;
+	private double r; //interest rate
+	private double B; //outside option
+	private double p; //price
 	
+	private int betaNE;
+	private int betaEE;
 	private int lambdaO;
 	private int lambdaF;
 	
-	//private int beta;
+	
 	//private int alpha;
 
 
@@ -198,12 +203,17 @@ public class Main extends SimModelImpl {
 		
 	}
 	
+	
 	public double computeEthnicworkerPayoff(Agent agent) {
-		return 0.0;
+		
+		double wage = betaEE*B + (1-betaEE)*p;
+		double payoff = (1-unemployment) * wage + unemployment*B + r*agent.getbI();
+		return payoff;
 		
 	}
 	public double computeUnemployedPayoff(Agent agent) {
-		return 0.0;
+		double payoff = B + r*agent.getbI();
+		return payoff;
 		
 	}
 	
