@@ -112,17 +112,17 @@ public class Main extends SimModelImpl {
 			//Occupation 1 is "Entrepreneur", 2 is "Work in Native Firm", 3 is "Work in  Ethnic Firm", 4 is "unemployed"
 			//gonna change this one after max change the agent class
 			if (random < 1.0/3) {
-				ag.setcurOccupation("Entrepreneur");
+				ag.setcurOccupation(1);
 				
 			}
 			else if(1.0/3 <= random && random < 2.0/3){
-				ag.setcurOccupation("Unemployed");
-				ag.setswitchOccupation("Work in Native Firm");
+				ag.setcurOccupation(4);
+				ag.setswitchOccupation(2);
 				
 			}
 			else {
-				ag.setcurOccupation("Unemployed");
-				ag.setswitchOccupation("Work in  Ethnic Firm");
+				ag.setcurOccupation(4);
+				ag.setswitchOccupation(3);
 				
 			}
 	
@@ -165,12 +165,12 @@ public class Main extends SimModelImpl {
 			double random = Math.random();
 			//String occupation;
 			if (random < 1.0/2) {
-				ag.setcurOccupation("Entrepreneur");
+				ag.setcurOccupation(1);
 				
 			}
 			else {
-				ag.setcurOccupation("Unemployed");
-				ag.setswitchOccupation("Work in  Native Firm");
+				ag.setcurOccupation(4);
+				ag.setswitchOccupation(2);
 			}
 			
 			ag.setCoordinate(new int[] {randomX, randomY});
@@ -224,13 +224,13 @@ public class Main extends SimModelImpl {
 	
 	public double computeEthnicworkerPayoff(Agent agent) {
 		
-		double wage = betaEE*B + (1-betaEE)*p;
-		double payoff = (1-unemployment) * wage + unemployment*B + r*agent.getbI();
+		double wage = betaEE*B + (1-betaEE)*pE;
+		double payoff = (1-unemployment) * wage + unemployment*B + r*agent.getWealthToBusiness();
 		return payoff;
 		
 	}
 	public double computeUnemployedPayoff(Agent agent) {
-		double payoff = B + r*agent.getbI();
+		double payoff = B + r*agent.getWealthToBusiness();
 		return payoff;
 		
 	}
@@ -255,31 +255,52 @@ public class Main extends SimModelImpl {
 	}
 	
 	
+	//in the excute() method, only agent with switchOccupation() == 2 or 3 will go through the method jobSearch.
+	//Occupation 2 is native firm work; 3 is ethnic firm worker.
+	
 	public Agent jobSearch (Agent agent) {
-		//whether we need to add the potential boss inside the Agent class?
-		//if native
-		//return nativeJobsearch (Agent agent);
-		//if ethnic 
-		//return ethnicJobsearch (Agent agent)
+		
+		if (agent.getswitchOccupation() == 2) {
+			return nativeJobsearch (agent);
+		}
+		else {
+			return ethnicJobsearch (agent);
+		}
 		
 	}
 	
 	public Agent nativeJobsearch (Agent agent) {
-		//whether we need to add the potential boss inside the Agent class?
-		//
 		
-		return boss;
+		ArrayList<Agent> firms = new ArrayList<Agent>();
+		
+		for (int i = 0;i< numAgents;i++) {
+			if (agentList.get(i).getRace() ==1 && agentList.get(i).getcurtOccupation()==1) {
+				firms.add(agentList.get(i));
+			}
+		}
+		
+		int random = (int) (Math.random() * firms.size()); 
+		return firms.get(random);
 		
 	}
 	public Agent ethnicJobsearch (Agent agent) {
-		//whether we need to add the potential boss inside the Agent class?
-		//
 		
+	Agent boss = new Agent();
 		return boss;
 	}
 	
+	//we are missing the process of boss to decide who they gonna hire for step2.
+	
+	//Step3:calculate the new unemployment rate
 	public double calUnemployed () {
-		return 0.0;
+		double num = 0;
+		for (int i = 0;i<numAgents;i++) {
+			if (agentList.get(i).getcurtOccupation()==4) {
+				num+=1;
+			};
+			
+		}
+		return num/numAgents;
 	}
 		
 	

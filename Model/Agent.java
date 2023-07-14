@@ -1,11 +1,16 @@
 package Model;
+import java.util.ArrayList;
 
 public class Agent {
     private int id;
     private int race;
     private int[] coordinate;
-    private String cur_occupation;
-    private String swicth_occupation;
+    private int cur_occupation;
+    private int swicth_occupation;
+    private Agent boss;
+    private ArrayList<Agent>employees = new ArrayList<>();
+    
+    
 
 
     private double x_i;  //Entrepreneurial spirit/ability
@@ -40,18 +45,18 @@ public class Agent {
         return coordinate;
     }
 
-    public void setcurOccupation(String cur_occupation) {
+    public void setcurOccupation(int cur_occupation) {
         this.cur_occupation = cur_occupation;
     }
 
-    public String getcurtOccupation() {
+    public int getcurtOccupation() {
         return cur_occupation;
     }
-    public void setswitchOccupation(String swicth_occupation) {
+    public void setswitchOccupation(int swicth_occupation) {
         this.swicth_occupation = swicth_occupation;
     }
 
-    public String getswitchcurtOccupation() {
+    public int getswitchOccupation() {
         return swicth_occupation;
     }
 
@@ -86,6 +91,21 @@ public class Agent {
 
     public void setWealthToBusiness(double wealth) {
         this.b_i = wealth;
+    }
+    
+    public void setBoss(Agent boss) {
+        this.boss = boss;
+    }
+
+    public Agent getBoss() {
+        return boss;
+    }
+    public void addEmployee(Agent employee) {
+        this.employees.add(employee);
+    }
+
+    public ArrayList<Agent> getEmployees() {
+        return employees;
     }
 
 
