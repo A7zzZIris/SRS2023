@@ -19,7 +19,7 @@ public class Main extends SimModelImpl {
 	private int ethnicNumber;
 	private int nativeNumber;
 	private int period;
-	
+	private double occupancy;
 	//private int lambda;
 	//private int beta;
 	//private int alpha;
@@ -35,7 +35,7 @@ public class Main extends SimModelImpl {
 
     @Override
 	public String[] getInitParam() {
-		return new String[]{"gridWidth", "gridHeight", "numAgents", "period"};
+		return new String[]{"gridWidth", "gridHeight", "period", "occupancy"};
 	}
 
     @Override
@@ -58,12 +58,11 @@ public class Main extends SimModelImpl {
 		period = 1000;
 		gridWidth = 50;
 		gridHeight = 50;
+		occupancy = 0.8;
 		numAgents = (int) (gridWidth * gridHeight * 0.8);
 		ethnicNumber = (int)(numAgents * 0.3);
 		nativeNumber = numAgents - ethnicNumber;
 		schedule = new Schedule(1);
-		
-		
 	}
 	
 	public void buildModel() {
@@ -99,7 +98,7 @@ public class Main extends SimModelImpl {
 			double random = Math.random();
 			//String occupation;
 			if (random < 1.0/3) {
-				ag.setcurOccupation("Entreperneur");
+				ag.setcurOccupation("Entrepreneur");
 				
 			}
 			else if(1.0/3 <= random && random < 2.0/3){
@@ -152,13 +151,12 @@ public class Main extends SimModelImpl {
 			double random = Math.random();
 			//String occupation;
 			if (random < 1.0/2) {
-				ag.setcurOccupation("Entreperneur");
+				ag.setcurOccupation("Entrepreneur");
 				
 			}
 			else {
 				ag.setcurOccupation("Unemployed");
 				ag.setswitchOccupation("Work in  Native Firm");
-				
 			}
 			
 			ag.setCoordinate(new int[] {randomX, randomY});
@@ -235,5 +233,12 @@ public class Main extends SimModelImpl {
 		this.numAgents = numAgents;
 	}
 
+	public double getOccupancy(){
+		return occupancy;
+	}
+
+	public void setOccupancy(double o){
+		this.occupancy = o;
+	}
    
 }
