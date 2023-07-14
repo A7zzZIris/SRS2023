@@ -1,4 +1,4 @@
-package SRS2023.Model;
+package Model;
 
 import java.util.ArrayList;
 
@@ -16,11 +16,16 @@ public class Main extends SimModelImpl {
 	private int gridWidth;
 	private int gridHeight;
 	private int numAgents;
+	private double minorityShares;
 	private int ethnicNumber;
 	private int nativeNumber;
 	private int period;
 	private double occupancy;
-	//private int lambda;
+	private double unemployment;
+	
+	private int lambdaO;
+	private int lambdaF;
+	
 	//private int beta;
 	//private int alpha;
 
@@ -59,8 +64,9 @@ public class Main extends SimModelImpl {
 		gridWidth = 50;
 		gridHeight = 50;
 		occupancy = 0.8;
-		numAgents = (int) (gridWidth * gridHeight * 0.8);
-		ethnicNumber = (int)(numAgents * 0.3);
+		minorityShares = 0.3;
+		numAgents = (int) (gridWidth * gridHeight * occupancy);
+		ethnicNumber = (int)(numAgents * minorityShares);
 		nativeNumber = numAgents - ethnicNumber;
 		schedule = new Schedule(1);
 	}
@@ -200,6 +206,64 @@ public class Main extends SimModelImpl {
 		return 0.0;
 		
 	}
+	
+	public double computeEntrepreneurUtility(double budget, double pE) {
+		
+		return 0.0;
+		
+	}
+	public double computeNativeworkerUtility(double budget, double pE) {
+		return 0.0;
+		
+	}
+	
+	public double computeEthnicworkerUtility(double budget, double pE) {
+		return 0.0;
+		
+	}
+	public double computeUnemployedUtility(double budget, double pE) {
+		return 0.0;
+		
+	}
+	
+	
+	public Agent jobSearch (Agent agent) {
+		//whether we need to add the potential boss inside the Agent class?
+		//if native
+		//return nativeJobsearch (Agent agent);
+		//if ethnic 
+		//return ethnicJobsearch (Agent agent)
+		
+	}
+	
+	public Agent nativeJobsearch (Agent agent) {
+		//whether we need to add the potential boss inside the Agent class?
+		//
+		
+		return boss;
+		
+	}
+	public Agent ethnicJobsearch (Agent agent) {
+		//whether we need to add the potential boss inside the Agent class?
+		//
+		
+		return boss;
+	}
+	
+	public double calUnemployed () {
+		return 0.0;
+	}
+		
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	public int getGridHeight() {
 		return gridHeight;

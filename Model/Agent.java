@@ -1,4 +1,4 @@
-package SRS2023.Model;
+package Model;
 
 public class Agent {
     private int id;
