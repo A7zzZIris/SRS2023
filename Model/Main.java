@@ -1,4 +1,4 @@
-package Model;
+package SRS2023.Model;
 
 import java.util.Arrays;
 import java.util.ArrayList;
@@ -7,6 +7,7 @@ import uchicago.src.sim.analysis.DataRecorder;
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.engine.SimModelImpl;
 import uchicago.src.sim.space.Object2DGrid;
+import SRS2023.Model.Agent;
 
 public class Main extends SimModelImpl {
 
@@ -18,8 +19,8 @@ public class Main extends SimModelImpl {
 	private int gridHeight;
 	private int numAgents;
 	private double minorityShares;
-	private int ethnicNumber;
-	private int nativeNumber;
+	private int numEthnic;
+	private int numNative;
 	private int period;
 	private double occupancy;
 	private double unemployment;
@@ -70,8 +71,8 @@ public class Main extends SimModelImpl {
 		occupancy = 0.8;
 		minorityShares = 0.3;
 		numAgents = (int) (gridWidth * gridHeight * occupancy);
-		ethnicNumber = (int)(numAgents * minorityShares);
-		nativeNumber = numAgents - ethnicNumber;
+		numEthnic = (int)(numAgents * minorityShares);
+		numNative = numAgents - numEthnic;
 		schedule = new Schedule(1);
 	}
 	
@@ -80,7 +81,7 @@ public class Main extends SimModelImpl {
 		Grid = new Object2DGrid(gridWidth, gridHeight);
 		
 		//randomly allocate the minority
-		for (int id = 0; id < ethnicNumber; id ++) {
+		for (int id = 0; id < numEthnic; id ++) {
 			Agent ag = new Agent();
 			ag.setID(id);
 			//Race 1 refers to native and 2 refers to ethnic
@@ -125,11 +126,11 @@ public class Main extends SimModelImpl {
 			}
 	
 			
-			ag.setCoordinate(new int[] {randomX, randomY});
-			ag.setEntrepreneurialAbility(x_i);
-			ag.setCostofAssimulation(c_i);
-			ag.setProductivity(p_i);
-			ag.setWealthToBusiness(b_i);
+			ag.setCoords(new int[] {randomX, randomY});
+			ag.setXI(x_i);
+			ag.setCI(c_i);
+			ag.setPI(p_i);
+			ag.setBI(b_i);
 			agentList.add(ag);
 			
 			
@@ -139,7 +140,7 @@ public class Main extends SimModelImpl {
 		
 		
 		//randomly allocate the native
-		for (int id = ethnicNumber; id < nativeNumber; id++) {
+		for (int id = numEthnic; id < numNative; id++) {
 			Agent ag = new Agent();
 			ag.setID(id);
 			//Race 1 refers to majority
@@ -171,11 +172,11 @@ public class Main extends SimModelImpl {
 				ag.setswitchOccupation(2);
 			}
 			
-			ag.setCoordinate(new int[] {randomX, randomY});
-			ag.setEntrepreneurialAbility(x_i);
-			ag.setCostofAssimulation(c_i);
-			ag.setProductivity(p_i);
-			ag.setWealthToBusiness(b_i);
+			ag.setCoords(new int[] {randomX, randomY});
+			ag.setXI(x_i);
+			ag.setCI(c_i);
+			ag.setPI(p_i);
+			ag.setBI(b_i);
 			agentList.add(ag);
 			
 		}
@@ -185,8 +186,8 @@ public class Main extends SimModelImpl {
 	public int considerOccupation(Agent agent){
 		
 		double payoff1 = computeEntrepreneurUtility(computeEntrepreneurPayoff(agent), pE);
-		double payoff2 = computeNativeworkerUtility(computeNativeworkerPayoff(agent), pE);
-		double payoff3 = computeEthnicworkerUtility(computeEthnicworkerPayoff(agent), pE);
+		double payoff2 = computeNativeWorkerUtility(computeNativeWorkerPayoff(agent), pE);
+		double payoff3 = computeEthnicWorkerUtility(computeEthnicWorkerPayoff(agent), pE);
 		double payoff4 = computeUnemployedUtility(computeUnemployedPayoff(agent), pE);
 		
 		
@@ -214,21 +215,20 @@ public class Main extends SimModelImpl {
 		
 	}
 	
-	public double computeNativeworkerPayoff(Agent agent) {
+	public double computeNativeWorkerPayoff(Agent agent) {
+		double wage = 0;
 		return 0.0;
-		
 	}
 	
 	
-	public double computeEthnicworkerPayoff(Agent agent) {
-		
+	public double computeEthnicWorkerPayoff(Agent agent) {
 		double wage = betaEE*B + (1-betaEE)*pE;
-		double payoff = (1-unemployment) * wage + unemployment*B + r*agent.getWealthToBusiness();
+		double payoff = (1-unemployment) * wage + unemployment*B + r*agent.getBI();
 		return payoff;
 		
 	}
 	public double computeUnemployedPayoff(Agent agent) {
-		double payoff = B + r*agent.getWealthToBusiness();
+		double payoff = B + r*agent.getBI();
 		return payoff;
 		
 	}
@@ -238,12 +238,12 @@ public class Main extends SimModelImpl {
 		return 0.0;
 		
 	}
-	public double computeNativeworkerUtility(double budget, double pE) {
+	public double computeNativeWorkerUtility(double budget, double pE) {
 		return 0.0;
 		
 	}
 	
-	public double computeEthnicworkerUtility(double budget, double pE) {
+	public double computeEthnicWorkerUtility(double budget, double pE) {
 		return 0.0;
 		
 	}
@@ -290,7 +290,7 @@ public class Main extends SimModelImpl {
 	//we are missing the process of boss to decide who they gonna hire for step2.
 	
 	//Step3:calculate the new unemployment rate
-	public double calUnemployed () {
+	public double calcUnemployed () {
 		double num = 0;
 		for (int i = 0;i<numAgents;i++) {
 			if (agentList.get(i).getcurtOccupation()==4) {
@@ -300,17 +300,6 @@ public class Main extends SimModelImpl {
 		}
 		return num/numAgents;
 	}
-		
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 
 	public int getGridHeight() {
 		return gridHeight;

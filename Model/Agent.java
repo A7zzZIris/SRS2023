@@ -1,4 +1,4 @@
-package Model;
+package SRS2023.Model;
 
 import java.util.ArrayList;
 
@@ -59,35 +59,35 @@ public class Agent {
     }
 
 
-    public double getxI() {
+    public double getXI() {
         return xI;
     }
 
-    public void setxI(double xI) {
+    public void setXI(double xI) {
         this.xI = xI;
     }
 
-    public double getcI() {
+    public double getCI() {
         return cI;
     }
 
-    public void setcI(double cI) {
+    public void setCI(double cI) {
         this.cI = cI;
     }
 
-    public double getpI() {
+    public double getPI() {
         return pI;
     }
 
-    public void setpI(double pI) {
+    public void setPI(double pI) {
         this.pI = pI;
     }
 
-    public double getbI() {
+    public double getBI() {
         return bI;
     }
 
-    public void setbI(double bI) {
+    public void setBI(double bI) {
         this.bI = bI;
     }
 
