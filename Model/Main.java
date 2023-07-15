@@ -30,9 +30,7 @@ public class Main extends SimModelImpl {
 	private int betaNE;
 	private int betaEE;
 	private int lambdaO;
-	private int lambdaF;
-	
-	
+
 	//private int alpha;
 
 
