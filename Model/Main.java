@@ -15,6 +15,8 @@ import uchicago.src.sim.engine.SimModelImpl;
 import uchicago.src.sim.space.Object2DGrid;
 
 
+
+
 public class Main extends SimModelImpl {
 
 	private ArrayList<Agent> agentList;
@@ -239,7 +241,7 @@ public class Main extends SimModelImpl {
 	
 	
 	public double computeEthnicWorkerPayoff(Agent agent) {
-		double wage = betaEE*B + (1-betaEE)*pE;
+		double wage = betaEE*B + (1-betaEE)*agent.getPI();
 		double payoff = (1-unemployment) * wage + unemployment*B + r*agent.getBI();
 		return payoff;
 		
@@ -254,9 +256,23 @@ public class Main extends SimModelImpl {
 		//two conditions: native individuals and ethnic individuals
 		double u; 
 		if (agent.getRace()==1) {
+			int cNE; 
+			int cNG; 
+			
+			cNE = (int)((budget * gammaN)/pE);
+			cNG = (int)((1-gammaN)*budget);
+			u = Math.pow(cNE, gammaN) * Math.pow(cNG, 1-gammaN);
 			
 		}
 		else {
+			int cEE; 
+			int cEG; 
+			
+			cEE = (int)((budget * gammaE)/pE);
+			cEG = (int)((1-gammaE)*budget);
+			u = Math.pow(cEE, gammaE) * Math.pow(cEG, 1-gammaE);
+			
+			return u;
 			
 		}
 		
@@ -309,7 +325,6 @@ public class Main extends SimModelImpl {
 		//Only ethnic individuals can become workers in ethnic firms
 		int cEE; 
 		int cEG; 
-		double x; 
 		double u; 
 		
 		cEE = (int)((budget * gammaE)/pE);
@@ -367,7 +382,7 @@ public class Main extends SimModelImpl {
 		ArrayList<Agent> firms = new ArrayList<Agent>();
 		
 		for (int i = 0;i< numAgents;i++) {
-			if (agentList.get(i).getRace() ==1 && agentList.get(i).getcurtOccupation()==1) {
+			if (agentList.get(i).getRace() ==1 && agentList.get(i).getswitchOccupation()==1) {
 				firms.add(agentList.get(i));
 			}
 		}
@@ -379,14 +394,41 @@ public class Main extends SimModelImpl {
 	
 	
 	public Agent ethnicJobsearch (Agent agent) {
+		ArrayList<Agent> firms = new ArrayList<Agent>();
+		int x = agent.getCoords()[0]; 
+		int y = agent.getCoords()[0]; 
+
+		// 获取目标格子周围两圈的邻居格子
+		int radius = 2; 
 		
-	Agent boss = new Agent();
-		return boss;
+		
+		//make sure the coordinates are inside the boundaries of the grid.
+		int minX = Math.max(x - radius, 0);
+		int minY = Math.max(y - radius, 0);
+		int maxX = Math.min(x + radius, Grid.getSizeX() - 1);
+		int maxY = Math.min(y + radius, Grid.getSizeY() - 1);
+
+		for (int i = minX; i <= maxX; i++) {
+		    for (int j = minY; j <= maxY; j++) {
+		        if (i == x && j == y) {
+		            continue; // exclude the agent itself
+		        }
+		        if (agentList.get(i).getRace() == 2 && agentList.get(i).getswitchOccupation()== 1) {
+					firms.add(agentList.get(i));
+				}
+		    }
+		}
+		int random = (int) (Math.random() * firms.size()); 
+		return firms.get(random);
 	}
+		
+
+
 	
 	//we are missing the process of boss to decide who they gonna hire for step2.
 	
 	//Step3:calculate the new unemployment rate
+	
 	public double calcUnemployed () {
 		double num = 0;
 		for (int i = 0;i<numAgents;i++) {
@@ -397,6 +439,10 @@ public class Main extends SimModelImpl {
 		}
 		return num/numAgents;
 	}
+	
+	
+	
+	
 
 	public int getGridHeight() {
 		return gridHeight;
