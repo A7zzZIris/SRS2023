@@ -1,9 +1,9 @@
-//package SRS2023.Model;
+package SRS2023.Model;
 
-package Model;
+//package Model;
 
-//import SRS2023.Model.Agent;
-import Model.Agent;
+import SRS2023.Model.Agent;
+//import Model.Agent;
 
 import java.util.Arrays;
 import java.util.Vector;
@@ -233,8 +233,11 @@ public class Main extends SimModelImpl {
 	}
 	
 	public double computeNativeWorkerPayoff(Agent agent) {
-		double wage = 0;
-		return 0.0;
+		double wage = betaNE*B + (1-betaNE)*(agent.getPI());
+		double investments = r * agent.getBI();
+		//double cost =
+
+		return (1-unemployment) * wage +unemployment*B + investments - cost;
 	}
 	
 	
