@@ -36,8 +36,8 @@ public class Main extends SimModelImpl {
 	private double B; //outside option
 	private double pE; //price of ethnic good
 	
-	private int betaNE;
-	private int betaEE;
+	private int betaNE; //bargaining power
+	private int betaEE; //bargaining power
 	private int lambdaO;
 	private double gammaN;
 	private double gammaE;
@@ -89,9 +89,7 @@ public class Main extends SimModelImpl {
 	}
 	
 	public void buildModel() {
-		
 		Grid = new Object2DGrid(gridWidth, gridHeight);
-		
 		//randomly allocate the minority
 		for (int id = 0; id < numEthnic; id ++) {
 			Agent ag = new Agent();
@@ -134,7 +132,7 @@ public class Main extends SimModelImpl {
 			else {
 				ag.setcurOccupation(4);
 				ag.setswitchOccupation(3);
-				
+
 			}
 	
 			
@@ -144,10 +142,6 @@ public class Main extends SimModelImpl {
 			ag.setPI(p_i);
 			ag.setBI(b_i);
 			agentList.add(ag);
-			
-			
-			
-			
 		}
 		
 		
@@ -168,10 +162,8 @@ public class Main extends SimModelImpl {
 				randomX = (int) (Math.random() * gridWidth);
 				randomY = (int) (Math.random() * gridHeight);
 			}
-			
 			Grid.putObjectAt(randomX, randomY, ag);
-			
-			
+
 			//Allocate agents uniform randomly to initial occupations, all workers will unemployed and entrepreneurs will have no employees yet.
 			double random = Math.random();
 			//String occupation;
@@ -193,7 +185,6 @@ public class Main extends SimModelImpl {
 			
 		}
 	}
-	
 	
 	public int considerOccupation(Agent agent){
 		
@@ -228,15 +219,15 @@ public class Main extends SimModelImpl {
 		
 	}
 	
-	public double computeEntrepreneurPayoff(Agent agent) {
-		
+	public double computeEntrepreneurPayoff(Agent a) {
+		//
 		return 0.0;
-		
 	}
 	
-	public double computeNativeWorkerPayoff(Agent agent) {
-		double wage = 0;
-		return 0.0;
+	public double computeNativeWorkerPayoff(Agent a) {
+		double wage = betaNE*B + (1-betaNE)*(a.getPI());
+		double investments = r * a.getBI();
+		return (1-unemployment) * wage +unemployment*B + investments - a.cI;
 	}
 	
 	
