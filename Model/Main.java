@@ -1,13 +1,19 @@
-package SRS2023.Model;
+//package SRS2023.Model;
+
+package Model;
+
+//import SRS2023.Model.Agent;
+import Model.Agent;
 
 import java.util.Arrays;
+import java.util.Vector;
 import java.util.ArrayList;
 
 import uchicago.src.sim.analysis.DataRecorder;
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.engine.SimModelImpl;
 import uchicago.src.sim.space.Object2DGrid;
-import SRS2023.Model.Agent;
+
 
 public class Main extends SimModelImpl {
 
@@ -31,6 +37,10 @@ public class Main extends SimModelImpl {
 	private int betaNE;
 	private int betaEE;
 	private int lambdaO;
+	private double gammaN;
+	private double gammaE;
+	private double gammaEA;
+	private double theta;
 
 	//private int alpha;
 
@@ -185,22 +195,29 @@ public class Main extends SimModelImpl {
 	
 	public int considerOccupation(Agent agent){
 		
-		double payoff1 = computeEntrepreneurUtility(computeEntrepreneurPayoff(agent), pE);
-		double payoff2 = computeNativeWorkerUtility(computeNativeWorkerPayoff(agent), pE);
-		double payoff3 = computeEthnicWorkerUtility(computeEthnicWorkerPayoff(agent), pE);
-		double payoff4 = computeUnemployedUtility(computeUnemployedPayoff(agent), pE);
+		double u1 = computeEntrepreneurUtility(computeEntrepreneurPayoff(agent), pE, agent);
+		double u2 = computeNativeWorkerUtility(computeNativeWorkerPayoff(agent), pE, agent);
+		double u3;
+		if (agent.getRace()==1){
+			u3 = 0;
+		}
+		else {
+			u3 = computeEthnicWorkerUtility(computeEthnicWorkerPayoff(agent), pE, agent);
+		}
+		
+		double u4 = computeUnemployedUtility(computeUnemployedPayoff(agent), pE, agent);
 		
 		
-		//missing a condition: payoff is the same
-		double[] numbers = {payoff1, payoff2, payoff3, payoff4};
+		//missing a condition: utility is the same
+		double[] numbers = {u1, u2, u3, u4};
 		double max = Arrays.stream(numbers).max().getAsDouble();
-		if (max == payoff1) {
+		if (max == u1) {
 			return 1;
 		}
-		else if (max == payoff2) {
+		else if (max == u2) {
 			return 2;
 		}
-		else if (max == payoff3) {
+		else if (max == u3) {
 			return 3;
 		}
 		else {
@@ -233,22 +250,100 @@ public class Main extends SimModelImpl {
 		
 	}
 	
-	public double computeEntrepreneurUtility(double budget, double pE) {
+	public double computeEntrepreneurUtility(double budget, double pE, Agent agent) {
+		//two conditions: native individuals and ethnic individuals
+		double u; 
+		if (agent.getRace()==1) {
+			
+		}
+		else {
+			
+		}
 		
-		return 0.0;
+		
+		return u;
 		
 	}
-	public double computeNativeWorkerUtility(double budget, double pE) {
-		return 0.0;
+	public double computeNativeWorkerUtility(double budget, double pE, Agent agent) {
+		
+		//two conditions: native individuals and ethnic individuals
+		
+		double u; 
+		
+		if (agent.getRace()==1) {
+			int cNE; 
+			int cNG; 
+			
+			cNE = (int)((budget * gammaN)/pE);
+			cNG = (int)((1-gammaN)*budget);
+			u = Math.pow(cNE, gammaN) * Math.pow(cNG, 1-gammaN);
+			
+		}
+		else {
+			int cEE; 
+			int cEG; 
+			double x; 
+			cEE = (int)((budget * gammaEA)/pE);
+			cEG = (int)((1-gammaEA)*budget);
+			
+			Vector<Agent> neighborlist;
+			neighborlist = Grid.getMooreNeighbors(agent.getCoords()[0], agent.getCoords()[1], false);
+			double assimilation = 0;
+			for (int i = 0; i < neighborlist.size(); i++) {
+
+				if (neighborlist.get(i).getswitchOccupation() == 2 && neighborlist.get(i).getRace() == 2) {
+					assimilation += 1;
+				}
+		
+			}
+			x = assimilation/neighborlist.size();
+			u = Math.pow(cEE, gammaEA) * Math.pow(cEG, 1-gammaEA)+ theta * x;
+			
+		}
+	
+		return u;
 		
 	}
 	
-	public double computeEthnicWorkerUtility(double budget, double pE) {
-		return 0.0;
+	public double computeEthnicWorkerUtility(double budget, double pE, Agent agent) {
+		//Only ethnic individuals can become workers in ethnic firms
+		int cEE; 
+		int cEG; 
+		double x; 
+		double u; 
+		
+		cEE = (int)((budget * gammaE)/pE);
+		cEG = (int)((1-gammaE)*budget);
+		u = Math.pow(cEE, gammaE) * Math.pow(cEG, 1-gammaE);
+		
+		return u;
 		
 	}
-	public double computeUnemployedUtility(double budget, double pE) {
-		return 0.0;
+	
+	public double computeUnemployedUtility(double budget, double pE, Agent agent) {
+		double u; 
+		
+		//two conditions: native individuals and ethnic individuals
+		
+		if (agent.getRace()==1) {
+			int cNE; 
+			int cNG; 
+			
+			cNE = (int)((budget * gammaN)/pE);
+			cNG = (int)((1-gammaN)*budget);
+			u = Math.pow(cNE, gammaN) * Math.pow(cNG, 1-gammaN);
+			
+		}
+		else {
+			int cEE; 
+			int cEG; 
+			
+			cEE = (int)((budget * gammaE)/pE);
+			cEG = (int)((1-gammaE)*budget);
+			u = Math.pow(cEE, gammaE) * Math.pow(cEG, 1-gammaE);
+		}
+			
+		return u;
 		
 	}
 	
@@ -281,6 +376,8 @@ public class Main extends SimModelImpl {
 		return firms.get(random);
 		
 	}
+	
+	
 	public Agent ethnicJobsearch (Agent agent) {
 		
 	Agent boss = new Agent();
