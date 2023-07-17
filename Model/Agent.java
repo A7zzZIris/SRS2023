@@ -1,8 +1,12 @@
-//package SRS2023.Model;
-package Model;
+package SRS2023.Model;
+//package Model;
+import uchicago.src.sim.gui.Drawable;
+import uchicago.src.sim.gui.SimGraphics;
+
 import java.util.ArrayList;
 
-public class Agent {
+
+public class Agent implements Drawable {
     private int id;
     private int race;
     private int[] coords;
@@ -108,5 +112,19 @@ public class Agent {
     }
 
 
+    @Override
+    public void draw(SimGraphics simGraphics) {
+
+    }
+
+    @Override
+    public int getX() {
+        return getCoords()[0];
+    }
+
+    @Override
+    public int getY() {
+        return getCoords()[1];
+    }
 }
 
