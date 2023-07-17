@@ -11,7 +11,7 @@ public class Agent implements Drawable {
     private int race;
     private int[] coords;
     private int cur_occupation;
-    private int swicth_occupation;
+    private int switch_occupation;
     private Agent boss; //?
     private ArrayList<Agent> employees = new ArrayList<>();
 
@@ -54,12 +54,12 @@ public class Agent implements Drawable {
         return cur_occupation;
     }
 
-    public void setswitchOccupation(int swicth_occupation) {
-        this.swicth_occupation = swicth_occupation;
+    public void setSwitchOccupation(int switch_occupation) {
+        this.switch_occupation = switch_occupation;
     }
 
-    public int getswitchOccupation() {
-        return swicth_occupation;
+    public int getSwitchOccupation() {
+        return switch_occupation;
     }
 
 

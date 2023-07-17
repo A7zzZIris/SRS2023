@@ -9,6 +9,7 @@ import java.util.Vector;
 import java.util.ArrayList;
 
 import uchicago.src.sim.analysis.DataRecorder;
+import uchicago.src.sim.engine.BasicAction;
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.engine.SimModelImpl;
 import uchicago.src.sim.gui.Drawable;
@@ -65,7 +66,6 @@ public class Main extends SimModelImpl {
 		return null;
 	}
 
-
 	@Override
 	public void setup() {
 		// TODO Auto-generated method stub
@@ -80,6 +80,28 @@ public class Main extends SimModelImpl {
 		numNative = numAgents - numEthnic;
 		schedule = new Schedule(1);
 		display = new DisplaySurface(this, "test");
+	}
+
+	public void buildSchedule() {
+		schedule.scheduleActionBeginning(1.0, new schelling.Main.eachPeriod());
+		schedule.scheduleActionAt((double) period, new schelling.Main.finalPeriod());
+	}
+
+	class eachPeriod extends BasicAction {
+		public void execute() {
+			updatePercentage();
+			move();
+			// record every round agents' average ethnic percentage for the neighborhood
+			data1.record();
+			data1.write();
+
+		}
+	}
+
+	class finalPeriod extends BasicAction {
+		public void execute() {
+			stop();
+		}
 	}
 
 	public void buildDisplay() {
@@ -124,19 +146,15 @@ public class Main extends SimModelImpl {
 			//gonna change this one after max change the agent class
 			if (random < 1.0/3) {
 				ag.setcurOccupation(1);
-
 			}
 			else if(1.0/3 <= random && random < 2.0/3){
 				ag.setcurOccupation(4);
-				ag.setswitchOccupation(2);
-
+				ag.setSwitchOccupation(2);
 			}
 			else {
 				ag.setcurOccupation(4);
-				ag.setswitchOccupation(3);
-
+				ag.setSwitchOccupation(3);
 			}
-
 
 			ag.setCoords(new int[] {randomX, randomY});
 			ag.setXI(x_i);
@@ -175,7 +193,7 @@ public class Main extends SimModelImpl {
 			}
 			else {
 				ag.setcurOccupation(4);
-				ag.setswitchOccupation(2);
+				ag.setSwitchOccupation(2);
 			}
 
 			ag.setCoords(new int[] {randomX, randomY});
@@ -189,7 +207,6 @@ public class Main extends SimModelImpl {
 	}
 
 	public int considerOccupation(Agent agent){
-
 		double u1 = computeEntrepreneurUtility(computeEntrepreneurPayoff(agent), pE, agent);
 		double u2 = computeNativeWorkerUtility(computeNativeWorkerPayoff(agent), pE, agent);
 		double u3;
@@ -199,10 +216,7 @@ public class Main extends SimModelImpl {
 		else {
 			u3 = computeEthnicWorkerUtility(computeEthnicWorkerPayoff(agent), pE, agent);
 		}
-
 		double u4 = computeUnemployedUtility(computeUnemployedPayoff(agent), pE, agent);
-
-
 		//missing a condition: utility is the same
 		double[] numbers = {u1, u2, u3, u4};
 		double max = Arrays.stream(numbers).max().getAsDouble();
@@ -237,12 +251,10 @@ public class Main extends SimModelImpl {
 		double wage = betaEE*B + (1-betaEE)*agent.getPI();
 		double payoff = (1-unemployment) * wage + unemployment*B + r*agent.getBI();
 		return payoff;
-
 	}
 	public double computeUnemployedPayoff(Agent agent) {
 		double payoff = B + r*agent.getBI();
 		return payoff;
-
 	}
 
 	public double computeEntrepreneurUtility(double budget, double pE, Agent agent) {
@@ -300,7 +312,7 @@ public class Main extends SimModelImpl {
 			double assimilation = 0;
 			for (int i = 0; i < neighborlist.size(); i++) {
 
-				if (neighborlist.get(i).getswitchOccupation() == 2 && neighborlist.get(i).getRace() == 2) {
+				if (neighborlist.get(i).getSwitchOccupation() == 2 && neighborlist.get(i).getRace() == 2) {
 					assimilation += 1;
 				}
 
@@ -361,7 +373,7 @@ public class Main extends SimModelImpl {
 
 	public Agent jobSearch (Agent agent) {
 
-		if (agent.getswitchOccupation() == 2) {
+		if (agent.getSwitchOccupation() == 2) {
 			return nativeJobsearch (agent);
 		}
 		else {
@@ -375,7 +387,7 @@ public class Main extends SimModelImpl {
 		ArrayList<Agent> firms = new ArrayList<Agent>();
 
 		for (int i = 0;i< numAgents;i++) {
-			if (agentList.get(i).getRace() ==1 && agentList.get(i).getswitchOccupation()==1) {
+			if (agentList.get(i).getRace() ==1 && agentList.get(i).getSwitchOccupation()==1) {
 				firms.add(agentList.get(i));
 			}
 		}
@@ -406,7 +418,7 @@ public class Main extends SimModelImpl {
 		        if (i == x && j == y) {
 		            continue; // exclude the agent itself
 		        }
-		        if (agentList.get(i).getRace() == 2 && agentList.get(i).getswitchOccupation()== 1) {
+		        if (agentList.get(i).getRace() == 2 && agentList.get(i).getSwitchOccupation()== 1) {
 					firms.add(agentList.get(i));
 				}
 		    }
