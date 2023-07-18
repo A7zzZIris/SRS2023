@@ -124,7 +124,12 @@ public class Agent implements Drawable {
 
     @Override
     public void draw(SimGraphics simGraphics) {
-        simGraphics.drawFastRoundRect(color);
+        if(this.race == 1){
+            simGraphics.drawFastRoundRect(Color.RED);
+        }
+        else{
+            simGraphics.drawFastRoundRect(Color.BLUE);
+        }
     }
 
     @Override
