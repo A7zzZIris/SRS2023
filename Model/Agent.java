@@ -2,7 +2,7 @@ package SRS2023.Model;
 //package Model;
 import uchicago.src.sim.gui.Drawable;
 import uchicago.src.sim.gui.SimGraphics;
-
+import java.awt.Color;
 import java.util.ArrayList;
 
 
@@ -15,6 +15,8 @@ public class Agent implements Drawable {
     private Agent boss; //?
     private ArrayList<Agent> employees = new ArrayList<>();
     private ArrayList<Agent> applicants = new ArrayList<>();
+
+    private Color color = Color.RED;
 
     public double xI; // entrepreneurial spirit/ability
     public double cI; // cost of assimilation
@@ -122,7 +124,7 @@ public class Agent implements Drawable {
 
     @Override
     public void draw(SimGraphics simGraphics) {
-
+        simGraphics.drawFastRoundRect(color);
     }
 
     @Override

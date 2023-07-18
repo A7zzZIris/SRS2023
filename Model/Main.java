@@ -252,7 +252,7 @@ public class Main extends SimModelImpl {
 		int maxK = 0;
 		double maxProfit = 0.0;
 		for(int k = 0; k < 100; k++){ //iterate through workers
-			for(int)
+			//for(int)
 		}
 		return 0.0;
 	}
