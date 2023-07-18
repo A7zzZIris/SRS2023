@@ -1,8 +1,8 @@
-//package SRS2023.Model;
-package Model;
+package SRS2023.Model;
+//package Model;
 
-//import SRS2023.Model.Agent;
-import Model.Agent;
+import SRS2023.Model.Agent;
+//import Model.Agent;
 
 import java.util.Arrays;
 import java.util.Vector;
@@ -12,6 +12,7 @@ import uchicago.src.sim.analysis.DataRecorder;
 import uchicago.src.sim.engine.BasicAction;
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.engine.SimModelImpl;
+import uchicago.src.sim.gui.DisplayConstants;
 import uchicago.src.sim.gui.Drawable;
 import uchicago.src.sim.gui.Object2DDisplay;
 import uchicago.src.sim.gui.DisplaySurface;
@@ -23,7 +24,7 @@ public class Main extends SimModelImpl {
 	// private ArrayList agentList = new ArrayList<Agent>();
 	private Schedule schedule;
 	private Object2DGrid Grid;
-	private DisplaySurface display;
+	private DisplaySurface dsurf;
 	private int gridWidth;
 	private int gridHeight;
 	private int numAgents;
@@ -52,7 +53,9 @@ public class Main extends SimModelImpl {
 
     @Override
     public void begin() {
-        // TODO Auto-generated method stub
+        buildModel();
+		buildSchedule();
+		buildDisplay();
     }
 
     @Override
@@ -63,7 +66,7 @@ public class Main extends SimModelImpl {
 
     @Override
 	public Schedule getSchedule() {
-		return null;
+		return schedule;
 	}
 
 	@Override
@@ -79,7 +82,10 @@ public class Main extends SimModelImpl {
 		numEthnic = (int)(numAgents * minorityShares);
 		numNative = numAgents - numEthnic;
 		schedule = new Schedule(1);
-		display = new DisplaySurface(this, "test");
+		dsurf = new DisplaySurface(this, "test");
+		registerDisplaySurface("test", dsurf);
+		DisplayConstants.CELL_WIDTH = 50;
+		DisplayConstants.CELL_HEIGHT = 50;
 	}
 
 	public void buildSchedule() {
@@ -89,11 +95,11 @@ public class Main extends SimModelImpl {
 
 	class eachPeriod extends BasicAction {
 		public void execute() {
-			updatePercentage();
-			move();
+			calcUnemployment();
+			//move();
 			// record every round agents' average ethnic percentage for the neighborhood
-			data1.record();
-			data1.write();
+			//data1.record();
+			//data1.write();
 
 		}
 	}
@@ -105,12 +111,14 @@ public class Main extends SimModelImpl {
 	}
 
 	public void buildDisplay() {
+		System.out.println(Grid.getSizeX());
+		System.out.println(Grid.getSizeY());
 		Object2DDisplay agentDisplay = new Object2DDisplay(Grid);
 		agentDisplay.setObjectList(agentList);
 
-		display.addDisplayableProbeable(agentDisplay, "Agents");
-		addSimEventListener(display);
-
+		dsurf.addDisplayableProbeable(agentDisplay, "Agents");
+		addSimEventListener(dsurf);
+		dsurf.display();
 	}
 	public void buildModel() {
 		Grid = new Object2DGrid(gridWidth, gridHeight);
@@ -129,14 +137,16 @@ public class Main extends SimModelImpl {
 			//ethnic minorities will be located in the lower third of the lattice.
 			int min = (int) (gridHeight*(1.0/3.0));
 			int max = gridHeight;
-			int randomY = (int) (Math.random() * (max - min + 1)) + min;
+			int randomY = (int) (Math.random() * (max - min)) + min;
 			int randomX = (int) (Math.random() * gridWidth);
+			System.out.println("here " + String.valueOf(randomX) + " " + String.valueOf(randomY) );
+
 
 			while (Grid.getObjectAt(randomX, randomY) != null) {
-				randomY = (int) (Math.random() * (max - min + 1)) + min;
+				randomY = (int) (Math.random() * (max - min)) + min;
 				randomX = (int) (Math.random() * gridWidth);
 			}
-
+			System.out.println(String.valueOf(randomX) + " " + String.valueOf(randomY) );
 			Grid.putObjectAt(randomX, randomY, ag);
 
 			//Allocate agents uniform randomly to initial occupations, all workers will unemployed and entrepreneurs will have no employees yet.
@@ -157,6 +167,8 @@ public class Main extends SimModelImpl {
 			}
 
 			ag.setCoords(new int[] {randomX, randomY});
+			//System.out.println(ag.getCoords()[0]);
+			//System.out.println(ag.getCoords()[1]);
 			ag.setXI(x_i);
 			ag.setCI(c_i);
 			ag.setPI(p_i);
@@ -236,7 +248,10 @@ public class Main extends SimModelImpl {
 	}
 
 	public double computeEntrepreneurPayoff(Agent a) {
-		//
+		//pExIkI * sum of p< - sum
+		for(int k = 0; k < 100; k++){
+
+		}
 		return 0.0;
 	}
 
@@ -434,7 +449,7 @@ public class Main extends SimModelImpl {
 
 	//Step3:calculate the new unemployment rate
 
-	public double calcUnemployed () {
+	public void calcUnemployment () { //modified so would update the unemployment rate
 		double num = 0;
 		for (int i = 0;i<numAgents;i++) {
 			if (agentList.get(i).getcurtOccupation()==4) {
@@ -442,7 +457,7 @@ public class Main extends SimModelImpl {
 			};
 
 		}
-		return num/numAgents;
+		unemployment =  num/numAgents;
 	}
 
 
