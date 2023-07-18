@@ -36,7 +36,9 @@ public class Main extends SimModelImpl {
 	private double r; //interest rate
 	private double B; //outside option
 	private double pE; //price of ethnic good
-
+    private double averp; // workers' average productivity
+    private double alpha;
+    private double beta;
 	private int betaNE; //bargaining power
 	private int betaEE; //bargaining power
 	private int lambdaO;
@@ -235,10 +237,39 @@ public class Main extends SimModelImpl {
 
 	}
 
-	public double computeEntrepreneurPayoff(Agent a) {
-		//
-		return 0.0;
+	public double computeEntrepreneurPayoff(Agent agent) {
+		double wage;
+		
+		if (agent.getRace()==1) {
+			wage = (betaNE * B + (1-betaNE)* averp);
+		}
+		else {
+			wage = (betaEE * B + (1-betaNE)* averp);
+			
+		}
+		
+		
+		double x = agent.getXI();
+		
+		double numeratorN = x * Math.pow(averp, beta)*Math.pow(beta, 1-alpha)*Math.pow(alpha, alpha);
+		double denominatorN = Math.pow(wage, 1-alpha)* Math.pow(r, alpha);
+		double exponentN = 1/(1-alpha-beta);
+		
+		double numeratorK = x * Math.pow(averp, beta)*Math.pow(alpha, 1-beta)*Math.pow(beta, beta);
+		double denominatorK = Math.pow(wage, beta)* Math.pow(r, 1-beta);
+		double exponentK = 1/(1-alpha-beta);
+		
+		
+		double n = Math.pow(numeratorN/denominatorN,exponentN);
+		double k = Math.pow(numeratorK/denominatorK,exponentK);
+		
+		
+		double payoff = x * Math.pow(averp,beta) * Math.pow(k,alpha)* Math.pow(n,beta)- n * wage - r * k;
+		
+		
+		return payoff;
 	}
+	
 
 	public double computeWorkinNativePayoff(Agent a) {
 		double wage = betaNE*B + (1-betaNE)*(a.getPI());
