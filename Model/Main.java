@@ -208,13 +208,13 @@ public class Main extends SimModelImpl {
 
 	public int considerOccupation(Agent agent){
 		double u1 = computeEntrepreneurUtility(computeEntrepreneurPayoff(agent), pE, agent);
-		double u2 = computeNativeWorkerUtility(computeNativeWorkerPayoff(agent), pE, agent);
+		double u2 = computeWorkinNativeUtility(computeWorkinNativePayoff(agent), pE, agent);
 		double u3;
 		if (agent.getRace()==1){
 			u3 = 0;
 		}
 		else {
-			u3 = computeEthnicWorkerUtility(computeEthnicWorkerPayoff(agent), pE, agent);
+			u3 = computeWorkinEthnicUtility(computeWorkinEthnicPayoff(agent), pE, agent);
 		}
 		double u4 = computeUnemployedUtility(computeUnemployedPayoff(agent), pE, agent);
 		//missing a condition: utility is the same
@@ -240,14 +240,14 @@ public class Main extends SimModelImpl {
 		return 0.0;
 	}
 
-	public double computeNativeWorkerPayoff(Agent a) {
+	public double computeWorkinNativePayoff(Agent a) {
 		double wage = betaNE*B + (1-betaNE)*(a.getPI());
 		double investments = r * a.getBI();
 		return (1-unemployment) * wage +unemployment*B + investments - a.cI;
 	}
 
 
-	public double computeEthnicWorkerPayoff(Agent agent) {
+	public double computeWorkinEthnicPayoff(Agent agent) {
 		double wage = betaEE*B + (1-betaEE)*agent.getPI();
 		double payoff = (1-unemployment) * wage + unemployment*B + r*agent.getBI();
 		return payoff;
@@ -285,7 +285,7 @@ public class Main extends SimModelImpl {
 		return u;
 
 	}
-	public double computeNativeWorkerUtility(double budget, double pE, Agent agent) {
+	public double computeWorkinNativeUtility(double budget, double pE, Agent agent) {
 
 		//two conditions: native individuals and ethnic individuals
 
@@ -326,7 +326,7 @@ public class Main extends SimModelImpl {
 
 	}
 
-	public double computeEthnicWorkerUtility(double budget, double pE, Agent agent) {
+	public double computeWorkinEthnicUtility(double budget, double pE, Agent agent) {
 		//Only ethnic individuals can become workers in ethnic firms
 		int cEE;
 		int cEG;
