@@ -1,5 +1,5 @@
-package SRS2023.Model;
-//package Model;
+//package SRS2023.Model;
+package Model;
 import uchicago.src.sim.gui.Drawable;
 import uchicago.src.sim.gui.SimGraphics;
 
@@ -14,6 +14,7 @@ public class Agent implements Drawable {
     private int switch_occupation;
     private Agent boss; //?
     private ArrayList<Agent> employees = new ArrayList<>();
+    private ArrayList<Agent> applicants = new ArrayList<>();
 
     public double xI; // entrepreneurial spirit/ability
     public double cI; // cost of assimilation
@@ -109,6 +110,13 @@ public class Agent implements Drawable {
 
     public ArrayList<Agent> getEmployees() {
         return employees;
+    }
+    public void addApplicants(Agent applicant) {
+        this.applicants.add(applicant);
+    }
+
+    public ArrayList<Agent> getApplicants() {
+        return applicants;
     }
 
 

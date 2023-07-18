@@ -1,8 +1,8 @@
-package SRS2023.Model;
-//package Model;
+//package SRS2023.Model;
+package Model;
 
-import SRS2023.Model.Agent;
-//import Model.Agent;
+//import SRS2023.Model.Agent;
+import Model.Agent;
 
 import java.util.Arrays;
 import java.util.Vector;
@@ -83,8 +83,8 @@ public class Main extends SimModelImpl {
 	}
 
 	public void buildSchedule() {
-		schedule.scheduleActionBeginning(1.0, new schelling.Main.eachPeriod());
-		schedule.scheduleActionAt((double) period, new schelling.Main.finalPeriod());
+		schedule.scheduleActionBeginning(1.0, new eachPeriod());
+		schedule.scheduleActionAt((double) period, new finalPeriod());
 	}
 
 	class eachPeriod extends BasicAction {
@@ -402,8 +402,6 @@ public class Main extends SimModelImpl {
 		ArrayList<Agent> firms = new ArrayList<Agent>();
 		int x = agent.getCoords()[0];
 		int y = agent.getCoords()[0];
-
-		// 获取目标格子周围两圈的邻居格子
 		int radius = 2;
 
 
@@ -424,7 +422,9 @@ public class Main extends SimModelImpl {
 		    }
 		}
 		int random = (int) (Math.random() * firms.size());
-		return firms.get(random);
+		Agent boss = firms.get(random);
+		boss.addApplicants(agent);
+		return boss;
 	}
 
 
