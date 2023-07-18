@@ -16,8 +16,6 @@ public class Agent implements Drawable {
     private ArrayList<Agent> employees = new ArrayList<>();
     private ArrayList<Agent> applicants = new ArrayList<>();
 
-    private Color color = Color.RED;
-
     public double xI; // entrepreneurial spirit/ability
     public double cI; // cost of assimilation
     public double pI; // productivity
@@ -124,6 +122,7 @@ public class Agent implements Drawable {
 
     @Override
     public void draw(SimGraphics simGraphics) {
+        //key: different shades to signify native/ethnic, entrepreneur, employed, unemployed
         if(this.race == 1){
             simGraphics.drawFastRoundRect(Color.RED);
         }
@@ -142,4 +141,3 @@ public class Agent implements Drawable {
         return getCoords()[1];
     }
 }
-
