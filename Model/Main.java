@@ -1,12 +1,14 @@
-package SRS2023.Model;
-//package Model;
+//package SRS2023.Model;
+package Model;
 
-import SRS2023.Model.Agent;
-//import Model.Agent;
+//import SRS2023.Model.Agent;
+import Model.Agent;
 
 import java.util.Arrays;
 import java.util.Vector;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 import uchicago.src.sim.analysis.DataRecorder;
 import uchicago.src.sim.engine.BasicAction;
@@ -40,6 +42,7 @@ public class Main extends SimModelImpl {
     private double averp; // workers' average productivity
     private double alpha;
     private double beta;
+    private int betaN;
 	private int betaNE; //bargaining power
 	private int betaEE; //bargaining power
 	private int lambdaO;
@@ -48,7 +51,6 @@ public class Main extends SimModelImpl {
 	private double gammaEA;
 	private double theta;
 
-	//private int alpha;
 
 
     private DataRecorder data1;
@@ -97,8 +99,11 @@ public class Main extends SimModelImpl {
 
 	class eachPeriod extends BasicAction {
 		public void execute() {
-			calcUnemployment();
-			//move();
+			updateOccupationChoice();
+			updateApplications();
+			hireProcess();
+			updateUnemployment();
+			updateCaptical();
 			// record every round agents' average ethnic percentage for the neighborhood
 			//data1.record();
 			//data1.write();
@@ -219,6 +224,35 @@ public class Main extends SimModelImpl {
 
 		}
 	}
+	
+	//step1 Consider the occupation
+	public void updateOccupationChoice(){
+		for (int i = 0; i< agentList.size();i++) {
+			double random = Math.random();
+			Agent agent = agentList.get(i);
+			if (random < lambdaO) {
+				Agent boss = agent.getBoss();
+				int next = considerOccupation(agent);
+				agent.setSwitchOccupation(next);
+				
+				//cut the link with its boss if its current occupation is a worker and gonna change the job
+				if (agent.getSwitchOccupation()!= agent.getcurOccupation() && boss!= null) {
+					agent.setBoss(null);
+					boss.removeEmployee(agent);
+				}
+				//initialize Entrepreneurs' capital;
+				if (agent.getSwitchOccupation()!= agent.getcurOccupation() && agent.getSwitchOccupation()==1) {
+					agent.setK(agent.getBI());
+				}
+			}
+			
+			else {
+				agent.setSwitchOccupation(agent.getcurOccupation());
+			}				
+		}
+	}
+		
+
 
 	public int considerOccupation(Agent agent){
 		double u1 = computeEntrepreneurUtility(computeEntrepreneurPayoff(agent), pE, agent);
@@ -276,10 +310,17 @@ public class Main extends SimModelImpl {
 		double n = Math.pow(numeratorN/denominatorN,exponentN);
 		double k = Math.pow(numeratorK/denominatorK,exponentK);
 		
-		
+		if (agent.getRace()==1) {
+			n = Math.pow(numeratorN/denominatorN,exponentN);
+			k = Math.pow(numeratorK/denominatorK,exponentK);
+			
+		}
+		else {
+			n = Math.pow((pE*numeratorN)/denominatorN,exponentN);
+			k = Math.pow((pE*numeratorK)/denominatorK,exponentK);
+		}
 		double payoff = x * Math.pow(averp,beta) * Math.pow(k,alpha)* Math.pow(n,beta)- n * wage - r * k;
-		
-		
+
 		return payoff;
 	}
 
@@ -412,8 +453,17 @@ public class Main extends SimModelImpl {
 	}
 
 
-	//in the excute() method, only agent with switchOccupation() == 2 or 3 will go through the method jobSearch.
-	//Occupation 2 is native firm work; 3 is ethnic firm worker.
+
+	//step 2.1: sending the applications
+	public void updateApplications() {
+		for (int i = 0;i<agentList.size();i++) {
+			if (agentList.get(i).getSwitchOccupation()== 2 || agentList.get(i).getSwitchOccupation()== 3) {
+				Agent agent = agentList.get(i);
+				Agent boss = jobSearch(agent);
+				boss.addApplicants(agent);
+			}
+		}
+	}
 
 	public Agent jobSearch (Agent agent) {
 
@@ -471,23 +521,171 @@ public class Main extends SimModelImpl {
 		return boss;
 	}
 
+	
+	
+// step2.2: Enterpreneur's decision
+	
+	public void hireProcess() {
+		for (int i = 0; i< agentList.size();i++) {
+			Agent agent = agentList.get(i);
+			
+			if (agent.getSwitchOccupation() == 1) {
+				//become entrepreneur and hire worker
+				agent.setcurOccupation(1);
+				hireWorker(agent); 
+				}
+			}
+		}
+	
+	
+
+	
+	public void hireWorker(Agent agent) {
+		//order all the applicants from high productivity to low productivity
+		
+		ArrayList<Agent> applicants = agent.getApplicants();
+		Collections.sort(applicants, new AgentIDComparator());
+		Collections.reverse(applicants);
+
+        
+        for (Agent a : applicants) {
+
+        	ArrayList<Agent> curEmployees = agent.getEmployees();
+        	ArrayList<Agent> newEmployees = new ArrayList<>(curEmployees);  // a copy of curEmployees 
+        	newEmployees.add(a);
+        	double payoff0 = payoff (agent, curEmployees);
+        	double payoff1 = payoff (agent, newEmployees);
+        	
+        	if (payoff0>payoff1) {
+        		a.setcurOccupation(4); //applicant becomes unemployed.
+        		
+        	}
+        	else {
+        		agent.addEmployee(a);
+        		a.setBoss(agent);
+        		a.setcurOccupation(a.getSwitchOccupation());
+        	}
+        }
+        agent.cleanApplicants();
+        
+    }
+    
+    public double payoff (Agent agent, ArrayList<Agent> workers ) {
+    	double sumW = 0.0;
+    	double sumP = 0.0;
+    	double payoff;
+    	for (Agent a : workers) {
+    		double wage;
+    		if (a.getRace()== 1 && agent.getRace()== 1) {
+    			wage = betaN * B +(1 - betaN) * a.getPI();
+    			
+    		}
+    		else if (a.getRace()== 2 && agent.getRace()== 1){
+    			wage = betaNE * B +(1 - betaNE) * a.getPI();
+    		}
+    		else {
+    			wage = betaEE * B +(1 - betaEE) * a.getPI();
+    		}
+    		
+    		sumP += a.getPI();
+    		sumW += wage;
+    	}
+    	
+    	
+    	if (agent.getRace()==1) {
+    		payoff = agent.getXI()* Math.pow(agent.getK(),alpha) * Math.pow(sumP,beta) - sumW - r * agent.getK();
+    	}
+    	else {
+    		payoff = pE * agent.getXI()* Math.pow(agent.getK(),alpha) * Math.pow(sumP,beta) - sumW - r * agent.getK();
+    	}
+
+    	
+    	return payoff;
+    	
+    }
+    
+    
+    
+    static class AgentIDComparator implements Comparator<Agent> {
+        @Override
+        public int compare(Agent agent1, Agent agent2) {
+            // 根据 Agent 的 ID 属性进行比较
+            return Double.compare(agent1.getPI(), agent2.getPI());
+        }
+    }
+		
+		
 
 
+	//Step3:calculate and update the new unemployment rate
 
-	//we are missing the process of boss to decide who they gonna hire for step2.
-
-	//Step3:calculate the new unemployment rate
-
-	public void calcUnemployment () { //modified so would update the unemployment rate
+	public void updateUnemployment () { 
 		double num = 0;
 		for (int i = 0;i<numAgents;i++) {
-			if (agentList.get(i).getcurtOccupation()==4) {
+			if (agentList.get(i).getcurOccupation()==4) {
 				num+=1;
 			};
 
 		}
 		unemployment =  num/numAgents;
 	}
+	
+	//step4: update Entrepreneur's capital
+	public void updateCaptical() {
+		for (int i = 0; i< agentList.size();i++) {
+			Agent agent = agentList.get(i);
+			if (agent.getSwitchOccupation() == 1) {
+				double random = Math.random();
+				if (random < lambdaO) {
+					changeCapital(agent);
+				}
+			}
+		}
+	}
+	
+
+    public void changeCapital(Agent agent) {
+    	double sumW = 0.0;
+    	double sumP = 0.0;
+    	ArrayList<Agent> employees = agent.getEmployees();
+    	for (Agent a : employees) {
+    		double wage;
+    		if (a.getRace()== 1 && agent.getRace()== 1) {
+    			wage = betaN * B +(1 - betaN) * a.getPI();
+    			
+    		}
+    		else if (a.getRace()== 2 && agent.getRace()== 1){
+    			wage = betaNE * B +(1 - betaNE) * a.getPI();
+    		}
+    		else {
+    			//ethnic firms and ethnic workers
+    			wage = betaEE * B +(1 - betaEE) * a.getPI();
+    		}
+    		
+    		sumP += a.getPI();
+    		sumW += wage;
+    	}
+    	
+    	double numerator = sumW + r * agent.getK();
+		double denominator = alpha * Math.pow(sumP, beta) * agent.getXI();
+		double k = Math.pow(numerator/denominator, 1/(alpha-1));
+		agent.setK(k); 	
+    }
+    
+    
+    //step5: update the price of ethnic good
+    //how?
+    
+    public void updatePrice(){
+    	int totalD;
+    	int totalS;
+    	
+    }
+    
+  //  public int calSupply(Agent agent) {
+    	
+  //  }
+    
 
 
 

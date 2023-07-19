@@ -1,9 +1,11 @@
-package SRS2023.Model;
-//package Model;
+//package SRS2023.Model;
+package Model;
 import uchicago.src.sim.gui.Drawable;
 import uchicago.src.sim.gui.SimGraphics;
 import java.awt.Color;
 import java.util.ArrayList;
+
+
 
 
 public class Agent implements Drawable {
@@ -16,10 +18,15 @@ public class Agent implements Drawable {
     private ArrayList<Agent> employees = new ArrayList<>();
     private ArrayList<Agent> applicants = new ArrayList<>();
 
-    public double xI; // entrepreneurial spirit/ability
-    public double cI; // cost of assimilation
-    public double pI; // productivity
-    public double bI; // capital
+    private double xI; // entrepreneurial spirit/ability
+    private double cI; // cost of assimilation
+    private double pI; // productivity
+    private double bI; // wealth to start the business
+    private double K; // current capital
+    
+    private int cE; // amount for ethnic good
+    private int cG; // amount for general good
+    
 
     public void setID(int id) {
         this.id = id;
@@ -51,7 +58,7 @@ public class Agent implements Drawable {
         this.cur_occupation = cur_occupation;
     }
 
-    public int getcurtOccupation() {
+    public int getcurOccupation() {
         return cur_occupation;
     }
 
@@ -95,6 +102,13 @@ public class Agent implements Drawable {
     public void setBI(double bI) {
         this.bI = bI;
     }
+    public double getK() {
+        return K;
+    }
+
+    public void setK(double K) {
+        this.K = K;
+    }
 
     public void setBoss(Agent boss) {
         this.boss = boss;
@@ -118,8 +132,32 @@ public class Agent implements Drawable {
     public ArrayList<Agent> getApplicants() {
         return applicants;
     }
+    public void cleanApplicants() {
+        applicants.clear();
+    }
+    public void removeEmployee(Agent agent) {
+    	employees.remove(agent);
+    	
+    }
+    
+    public int getdemandE() {
+    	return cE;
+    	
+    }
+    public void setdemandE(int cE) {
+    	this.cE = cE;
+    }
+    public int getdemandG() {
+    	return cG;
+    	
+    }
+    public void setdemandG(int cG) {
+    	this.cG = cG;
+    }
 
 
+    
+    
     @Override
     public void draw(SimGraphics simGraphics) {
         //key: different shades to signify native/ethnic, entrepreneur, employed, unemployed
