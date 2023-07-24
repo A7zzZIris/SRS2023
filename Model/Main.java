@@ -42,10 +42,10 @@ public class Main extends SimModelImpl {
     private double averp; // workers' average productivity
     private double alpha;
     private double beta;
-    private int betaN;
-	private int betaNE; //bargaining power
-	private int betaEE; //bargaining power
-	private int lambdaO;
+    private double betaN;
+	private double betaNE; //bargaining power
+	private double betaEE; //bargaining power
+	private double lambdaO;
 	private double gammaN;
 	private double gammaE;
 	private double gammaEA;
@@ -63,7 +63,7 @@ public class Main extends SimModelImpl {
     }
 
     @Override
-	public String[] getInitParam() {return new String[]{"gridWidth", "gridHeight", "period", "occupancy"};}
+	public String[] getInitParam() {return new String[]{"gridWidth", "gridHeight", "period", "occupancy", "alpha","beta","betaN","betaNE","betaEE","lambdaO","gammaN","gammaE","gammEA","theta"};}
 
     @Override
     public String getName() {return "Entrepreneurship Model";}
@@ -674,7 +674,7 @@ public class Main extends SimModelImpl {
     
     
     //step5: update the price of ethnic good
-    //how?
+
     
     public void updatePrice(){
     	int totalD;
@@ -682,9 +682,7 @@ public class Main extends SimModelImpl {
     	
     }
     
-  //  public int calSupply(Agent agent) {
-    	
-  //  }
+
     
 
 
@@ -729,6 +727,79 @@ public class Main extends SimModelImpl {
 
 	public void setOccupancy(double o){
 		this.occupancy = o;
+	}
+	
+	
+	
+	public double getAlpha(){
+		return alpha;
+	}
+
+	public void setAlpha(double alpha){
+		this.alpha = alpha;
+	}
+	public double getBeta(){
+		return beta;
+	}
+
+	public void setBeta(double beta){
+		this.beta = beta;
+	}
+	public double getBetaN(){
+		return betaN;
+	}
+
+	public void setBetaN(double betaN){
+		this.betaN = betaN;
+	}
+	public double getBetaNE(){
+		return betaNE;
+	}
+
+	public void setBetaNE(double betaNE){
+		this.betaNE = betaNE;
+	}
+	public double getBetaEE(){
+		return betaEE;
+	}
+
+	public void setBetaEE(double betaEE){
+		this.betaEE = betaEE;
+	}
+	public double getLambdaO(){
+		return lambdaO;
+	}
+
+	public void setLambdaO(double lambdaO){
+		this.lambdaO = lambdaO;
+	}
+	public double getGammaN(){
+		return gammaN;
+	}
+
+	public void setGammaN(double gammaN){
+		this.gammaN = gammaN;
+	}
+	public double getGammaE(){
+		return gammaE;
+	}
+
+	public void setGammaE(double gammaE){
+		this.gammaE = gammaE;
+	}
+	public double getGammaEA(){
+		return gammaEA;
+	}
+
+	public void setGammaEA(double gammaEA){
+		this.gammaEA = gammaEA;
+	}
+	public double getTheta(){
+		return theta;
+	}
+
+	public void setThata(double theta){
+		this.theta = theta;
 	}
 
 }
