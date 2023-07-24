@@ -798,7 +798,7 @@ public class Main extends SimModelImpl {
 		return theta;
 	}
 
-	public void setThata(double theta){
+	public void setTheta(double theta){
 		this.theta = theta;
 	}
 
