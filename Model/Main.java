@@ -325,10 +325,11 @@ public class Main extends SimModelImpl {
 	}
 
 
-	public double computeWorkinNativePayoff(Agent a) {
-		double wage = betaNE*B + (1-betaNE)*(a.getPI());
-		double investments = r * a.getBI();
-		return (1-unemployment) * wage +unemployment*B + investments - a.cI;
+	public double computeWorkinNativePayoff(Agent agent) {
+		double wage = betaN*B + (1-betaN)*(agent.getPI());
+		//double investments = r * a.getBI();
+		double payoff = (1-unemployment) * wage + unemployment*B + r*agent.getBI();
+		return payoff;
 	}
 
 
@@ -728,8 +729,7 @@ public class Main extends SimModelImpl {
 	public void setOccupancy(double o){
 		this.occupancy = o;
 	}
-	
-	
+
 	
 	public double getAlpha(){
 		return alpha;
