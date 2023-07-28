@@ -455,17 +455,21 @@ public class Main extends SimModelImpl {
 
 
 
-	//step 2.1: sending the applications
+//step 2.1: sending the applications.
+//This method iterate through every agent, and the individuals that want to switch to the workers will send the application to the entrepreneur.
+
 	public void updateApplications() {
 		for (int i = 0;i<agentList.size();i++) {
 			if (agentList.get(i).getSwitchOccupation()== 2 || agentList.get(i).getSwitchOccupation()== 3) {
 				Agent agent = agentList.get(i);
 				Agent boss = jobSearch(agent);
-				boss.addApplicants(agent);
+				boss.addApplicants(agent); //send the application
 			}
 		}
 	}
 
+//the agent search for job in different ways, according to their races. 
+// It will return the entrepreneur that he gonna send the application to.
 	public Agent jobSearch (Agent agent) {
 
 		if (agent.getSwitchOccupation() == 2) {
@@ -477,6 +481,9 @@ public class Main extends SimModelImpl {
 
 	}
 
+	
+//In this function, the input agent is the native individual that looking for the firms,
+//and it will return the entrepreneur that the agent chooses to send the application
 	public Agent nativeJobsearch (Agent agent) {
 
 		ArrayList<Agent> firms = new ArrayList<Agent>();
@@ -492,7 +499,9 @@ public class Main extends SimModelImpl {
 
 	}
 
-
+//in this function, the input agent is the ethnic individual that looking for the firms, 
+//and it will return the entrepreneur that the agent chooses to send the application
+	
 	public Agent ethnicJobsearch (Agent agent) {
 		ArrayList<Agent> firms = new ArrayList<Agent>();
 		int x = agent.getCoords()[0];
@@ -505,17 +514,21 @@ public class Main extends SimModelImpl {
 		int minY = Math.max(y - radius, 0);
 		int maxX = Math.min(x + radius, Grid.getSizeX() - 1);
 		int maxY = Math.min(y + radius, Grid.getSizeY() - 1);
+		
+		// finding all the potential firms that they can send the applications
 
 		for (int i = minX; i <= maxX; i++) {
 		    for (int j = minY; j <= maxY; j++) {
 		        if (i == x && j == y) {
-		            continue; // exclude the agent itself
+		            continue; 
 		        }
 		        if (agentList.get(i).getRace() == 2 && agentList.get(i).getSwitchOccupation()== 1) {
 					firms.add(agentList.get(i));
 				}
 		    }
 		}
+		
+		// randomly choose one entrepreneur within all the potential choices, and update the entreprenuer's applications
 		int random = (int) (Math.random() * firms.size());
 		Agent boss = firms.get(random);
 		boss.addApplicants(agent);
@@ -525,14 +538,16 @@ public class Main extends SimModelImpl {
 	
 	
 // step2.2: Enterpreneur's decision
-	
+//First update the individual's current occupation if they choose to switch to entrepreneurs;
+//Both old and new entrepreneurs start to hire the workers.
 	public void hireProcess() {
 		for (int i = 0; i< agentList.size();i++) {
 			Agent agent = agentList.get(i);
 			
 			if (agent.getSwitchOccupation() == 1) {
-				//become entrepreneur and hire worker
 				agent.setcurOccupation(1);
+				}
+			if (agent.getcurOccupation() == 1) {
 				hireWorker(agent); 
 				}
 			}
@@ -540,8 +555,9 @@ public class Main extends SimModelImpl {
 	
 	
 
-	
+// This method will evaluate all the applicants of the entrepreneurs and hire each of them if they can increase entrepreneur's profit.
 	public void hireWorker(Agent agent) {
+		
 		//order all the applicants from high productivity to low productivity
 		
 		ArrayList<Agent> applicants = agent.getApplicants();
@@ -550,10 +566,10 @@ public class Main extends SimModelImpl {
 
         
         for (Agent a : applicants) {
-
         	ArrayList<Agent> curEmployees = agent.getEmployees();
         	ArrayList<Agent> newEmployees = new ArrayList<>(curEmployees);  // a copy of curEmployees 
         	newEmployees.add(a);
+        	//compare the payoff
         	double payoff0 = payoff (agent, curEmployees);
         	double payoff1 = payoff (agent, newEmployees);
         	
@@ -571,6 +587,7 @@ public class Main extends SimModelImpl {
         
     }
     
+//this method will compute the agent's(entrepreneur) payoff with a specific list of worker
     public double payoff (Agent agent, ArrayList<Agent> workers ) {
     	double sumW = 0.0;
     	double sumP = 0.0;
@@ -610,7 +627,7 @@ public class Main extends SimModelImpl {
     static class AgentIDComparator implements Comparator<Agent> {
         @Override
         public int compare(Agent agent1, Agent agent2) {
-            // 根据 Agent 的 ID 属性进行比较
+            // 根据 Agent 的 productivity 属性进行比较
             return Double.compare(agent1.getPI(), agent2.getPI());
         }
     }
@@ -632,6 +649,7 @@ public class Main extends SimModelImpl {
 	}
 	
 	//step4: update Entrepreneur's capital
+	//This method will iterate through every agent and let the entrepreneurs adjust their capital will possibility lambdaO.
 	public void updateCaptical() {
 		for (int i = 0; i< agentList.size();i++) {
 			Agent agent = agentList.get(i);
@@ -644,7 +662,7 @@ public class Main extends SimModelImpl {
 		}
 	}
 	
-
+	//agent(entrepreneur) will adjust their capital
     public void changeCapital(Agent agent) {
     	double sumW = 0.0;
     	double sumP = 0.0;
