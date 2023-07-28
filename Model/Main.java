@@ -104,8 +104,10 @@ public class Main extends SimModelImpl {
 			updateApplications();
 			hireProcess();
 			updateUnemployment();
-			updateCaptical();
+			updateCapital();
 			// record every round agents' average ethnic percentage for the neighborhood
+			// percentages of entrepreneurs by race
+			// measure of segregation
 			//data1.record();
 			//data1.write();
 		}
@@ -118,8 +120,6 @@ public class Main extends SimModelImpl {
 	}
 
 	public void buildDisplay() {
-		System.out.println(Grid.getSizeX());
-		System.out.println(Grid.getSizeY());
 		Object2DDisplay agentDisplay = new Object2DDisplay(Grid);
 		agentDisplay.setObjectList(agentList);
 
@@ -629,7 +629,7 @@ public class Main extends SimModelImpl {
 	}
 	
 	//step4: update Entrepreneur's capital
-	public void updateCaptical() {
+	public void updateCapital() {
 		for (int i = 0; i< agentList.size();i++) {
 			Agent agent = agentList.get(i);
 			if (agent.getSwitchOccupation() == 1) {
@@ -669,21 +669,22 @@ public class Main extends SimModelImpl {
 		double k = Math.pow(numerator/denominator, 1/(alpha-1));
 		agent.setK(k); 	
     }
-    
-    
+
     //step5: update the price of ethnic good
 
     //4.3 compute total supply and demand
+	// aggregate demand - agents maximizing utility given current income
+	// demand as a function of price
+	// supply - total production of eutrepreneurs assuming current entrepreneurs and labor holdings
     public void updatePrice(){
+		// agg demand - for all agents - demand for ethnic goods under different prices
+		// can use prev aggregate supply - iterate through all ethnic entrepreneurs -> calc using production function
+		// price = 0.5 -> 0.6
+
     	int totalD;
     	int totalS;
-    	
+		//pE =
     }
-    
-
-    
-
-
 
 
 
