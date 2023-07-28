@@ -1,8 +1,8 @@
-//package SRS2023.Model;
-package Model;
+package SRS2023.Model;
+//package Model;
 
-//import SRS2023.Model.Agent;
-import Model.Agent;
+import SRS2023.Model.Agent;
+//import Model.Agent;
 
 import java.util.Arrays;
 import java.util.Vector;
@@ -51,8 +51,6 @@ public class Main extends SimModelImpl {
 	private double gammaEA;
 	private double theta;
 
-
-
     private DataRecorder data1;
 
     @Override
@@ -83,8 +81,11 @@ public class Main extends SimModelImpl {
 		occupancy = 0.8;
 		minorityShares = 0.3;
 		numAgents = (int) (gridWidth * gridHeight * occupancy);
-		numEthnic = (int)(numAgents * minorityShares);
+		System.out.println("Num Agents: " + numAgents);
+		numEthnic = (int) (numAgents * minorityShares);
+		System.out.println("Ethnic: " + numEthnic);
 		numNative = numAgents - numEthnic;
+		System.out.println("Native: " + numNative);
 		schedule = new Schedule(1);
 		dsurf = new DisplaySurface(this, "test");
 		registerDisplaySurface("test", dsurf);
@@ -107,7 +108,6 @@ public class Main extends SimModelImpl {
 			// record every round agents' average ethnic percentage for the neighborhood
 			//data1.record();
 			//data1.write();
-
 		}
 	}
 
@@ -142,7 +142,7 @@ public class Main extends SimModelImpl {
 			double b_i = Math.random(); //Wealth used to be starting a business
 
 			//ethnic minorities will be located in the lower third of the lattice.
-			int min = (int) (gridHeight*(1.0/3.0));
+			int min = (int) (gridHeight*(2.0/3.0));
 			int max = gridHeight;
 			int randomY = (int) (Math.random() * (max - min)) + min;
 			int randomX = (int) (Math.random() * gridWidth);
@@ -280,7 +280,6 @@ public class Main extends SimModelImpl {
 		else {
 			return 4;
 		}
-
 	}
 
 
@@ -292,7 +291,6 @@ public class Main extends SimModelImpl {
 		}
 		else {
 			wage = (betaEE * B + (1-betaNE)* averp);
-			
 		}
 		
 		
@@ -364,7 +362,6 @@ public class Main extends SimModelImpl {
 			u = Math.pow(cEE, gammaE) * Math.pow(cEG, 1-gammaE);
 
 			return u;
-
 		}
 
 
@@ -676,7 +673,7 @@ public class Main extends SimModelImpl {
     
     //step5: update the price of ethnic good
 
-    
+    //4.3 compute total supply and demand
     public void updatePrice(){
     	int totalD;
     	int totalS;

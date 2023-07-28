@@ -1,12 +1,9 @@
-//package SRS2023.Model;
-package Model;
+package SRS2023.Model;
+//package Model;
 import uchicago.src.sim.gui.Drawable;
 import uchicago.src.sim.gui.SimGraphics;
 import java.awt.Color;
 import java.util.ArrayList;
-
-
-
 
 public class Agent implements Drawable {
     private int id;
@@ -36,15 +33,9 @@ public class Agent implements Drawable {
         return id;
     }
 
-    public void setRace(int race) {
-        this.race = race;
+    public void setRace(int race) { this.race = race;}
 
-    }
-
-    public int getRace() {
-        return race;
-
-    }
+    public int getRace() { return race;}
 
     public void setCoords(int[] coords) {
         this.coords = coords;
@@ -69,7 +60,6 @@ public class Agent implements Drawable {
     public int getSwitchOccupation() {
         return switch_occupation;
     }
-
 
     public double getXI() {
         return xI;
@@ -137,19 +127,16 @@ public class Agent implements Drawable {
     }
     public void removeEmployee(Agent agent) {
     	employees.remove(agent);
-    	
     }
     
     public int getdemandE() {
     	return cE;
-    	
     }
     public void setdemandE(int cE) {
     	this.cE = cE;
     }
     public int getdemandG() {
     	return cG;
-    	
     }
     public void setdemandG(int cG) {
     	this.cG = cG;
@@ -161,21 +148,31 @@ public class Agent implements Drawable {
     @Override
     public void draw(SimGraphics simGraphics) {
         //key: different shades to signify native/ethnic, entrepreneur, employed, unemployed
-        if(this.race == 1){
+        if(this.race == 1){//native
+            //Occupation 1 is "Entrepreneur", 2 is "Work in Native Firm", 3 is "Work in  Ethnic Firm", 4 is "unemployed"
+            if(this.cur_occupation == 1){//entrepreneur
+                //simGraphics.drawFastRoundRect(new Color());
+            }
             simGraphics.drawFastRoundRect(Color.RED);
         }
-        else{
+        else{//ethnic
+            if(this.cur_occupation==1){
+
+            }
+            else if(this.cur_occupation==2){
+
+            }
             simGraphics.drawFastRoundRect(Color.BLUE);
         }
     }
 
     @Override
     public int getX() {
-        return getCoords()[0];
+        return this.coords[0];
     }
 
     @Override
     public int getY() {
-        return getCoords()[1];
+        return this.coords[1];
     }
 }
