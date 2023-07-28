@@ -1,8 +1,8 @@
 //package SRS2023.Model;
-package Model;
+//package Model;
 
 //import SRS2023.Model.Agent;
-import Model.Agent;
+//import Model.Agent;
 
 import java.util.Arrays;
 import java.util.Vector;
@@ -51,8 +51,6 @@ public class Main extends SimModelImpl {
 	private double gammaEA;
 	private double theta;
 
-
-
     private DataRecorder data1;
 
     @Override
@@ -83,8 +81,11 @@ public class Main extends SimModelImpl {
 		occupancy = 0.8;
 		minorityShares = 0.3;
 		numAgents = (int) (gridWidth * gridHeight * occupancy);
-		numEthnic = (int)(numAgents * minorityShares);
+		System.out.println("Num Agents: " + numAgents);
+		numEthnic = (int) (numAgents * minorityShares);
+		System.out.println("Ethnic: " + numEthnic);
 		numNative = numAgents - numEthnic;
+		System.out.println("Native: " + numNative);
 		schedule = new Schedule(1);
 		dsurf = new DisplaySurface(this, "test");
 		registerDisplaySurface("test", dsurf);
@@ -103,11 +104,12 @@ public class Main extends SimModelImpl {
 			updateApplications();
 			hireProcess();
 			updateUnemployment();
-			updateCaptical();
+			updateCapital();
 			// record every round agents' average ethnic percentage for the neighborhood
+			// percentages of entrepreneurs by race
+			// measure of segregation
 			//data1.record();
 			//data1.write();
-
 		}
 	}
 
@@ -118,8 +120,6 @@ public class Main extends SimModelImpl {
 	}
 
 	public void buildDisplay() {
-		System.out.println(Grid.getSizeX());
-		System.out.println(Grid.getSizeY());
 		Object2DDisplay agentDisplay = new Object2DDisplay(Grid);
 		agentDisplay.setObjectList(agentList);
 
@@ -142,7 +142,7 @@ public class Main extends SimModelImpl {
 			double b_i = Math.random(); //Wealth used to be starting a business
 
 			//ethnic minorities will be located in the lower third of the lattice.
-			int min = (int) (gridHeight*(1.0/3.0));
+			int min = (int) (gridHeight*(2.0/3.0));
 			int max = gridHeight;
 			int randomY = (int) (Math.random() * (max - min)) + min;
 			int randomX = (int) (Math.random() * gridWidth);
@@ -280,7 +280,6 @@ public class Main extends SimModelImpl {
 		else {
 			return 4;
 		}
-
 	}
 
 
@@ -292,7 +291,6 @@ public class Main extends SimModelImpl {
 		}
 		else {
 			wage = (betaEE * B + (1-betaNE)* averp);
-			
 		}
 		
 		
@@ -364,7 +362,6 @@ public class Main extends SimModelImpl {
 			u = Math.pow(cEE, gammaE) * Math.pow(cEG, 1-gammaE);
 
 			return u;
-
 		}
 
 
@@ -649,8 +646,11 @@ public class Main extends SimModelImpl {
 	}
 	
 	//step4: update Entrepreneur's capital
+
 	//This method will iterate through every agent and let the entrepreneurs adjust their capital will possibility lambdaO.
-	public void updateCaptical() {
+
+	public void updateCapital() {
+
 		for (int i = 0; i< agentList.size();i++) {
 			Agent agent = agentList.get(i);
 			if (agent.getSwitchOccupation() == 1) {
@@ -690,21 +690,22 @@ public class Main extends SimModelImpl {
 		double k = Math.pow(numerator/denominator, 1/(alpha-1));
 		agent.setK(k); 	
     }
-    
-    
+
     //step5: update the price of ethnic good
 
-    
+    //4.3 compute total supply and demand
+	// aggregate demand - agents maximizing utility given current income
+	// demand as a function of price
+	// supply - total production of eutrepreneurs assuming current entrepreneurs and labor holdings
     public void updatePrice(){
+		// agg demand - for all agents - demand for ethnic goods under different prices
+		// can use prev aggregate supply - iterate through all ethnic entrepreneurs -> calc using production function
+		// price = 0.5 -> 0.6
+
     	int totalD;
     	int totalS;
-    	
+		//pE =
     }
-    
-
-    
-
-
 
 
 
