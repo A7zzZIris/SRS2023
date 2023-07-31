@@ -1,7 +1,7 @@
-//package SRS2023.Model;
+package SRS2023.Model;
 //package Model;
 
-//import SRS2023.Model.Agent;
+import SRS2023.Model.Agent;
 //import Model.Agent;
 
 import java.util.Arrays;
@@ -475,7 +475,6 @@ public class Main extends SimModelImpl {
 		else {
 			return ethnicJobsearch (agent);
 		}
-
 	}
 
 	
@@ -640,7 +639,6 @@ public class Main extends SimModelImpl {
 			if (agentList.get(i).getcurOccupation()==4) {
 				num+=1;
 			};
-
 		}
 		unemployment =  num/numAgents;
 	}
@@ -650,7 +648,6 @@ public class Main extends SimModelImpl {
 	//This method will iterate through every agent and let the entrepreneurs adjust their capital will possibility lambdaO.
 
 	public void updateCapital() {
-
 		for (int i = 0; i< agentList.size();i++) {
 			Agent agent = agentList.get(i);
 			if (agent.getSwitchOccupation() == 1) {
@@ -671,7 +668,6 @@ public class Main extends SimModelImpl {
     		double wage;
     		if (a.getRace()== 1 && agent.getRace()== 1) {
     			wage = betaN * B +(1 - betaN) * a.getPI();
-    			
     		}
     		else if (a.getRace()== 2 && agent.getRace()== 1){
     			wage = betaNE * B +(1 - betaNE) * a.getPI();
@@ -696,14 +692,21 @@ public class Main extends SimModelImpl {
     //4.3 compute total supply and demand
 	// aggregate demand - agents maximizing utility given current income
 	// demand as a function of price
-	// supply - total production of eutrepreneurs assuming current entrepreneurs and labor holdings
+	// supply - total production of entrepreneurs assuming current entrepreneurs and labor holdings
     public void updatePrice(){
 		// agg demand - for all agents - demand for ethnic goods under different prices
 		// can use prev aggregate supply - iterate through all ethnic entrepreneurs -> calc using production function
 		// price = 0.5 -> 0.6
-
     	int totalD;
     	int totalS;
+		int sumPK = 0;
+		//calc totalS
+		for(int i = 0; i < agentList.size(); i++){
+			if(agentList.get(i).getRace() == 2 && agentList.get(i).getcurOccupation() == 1){
+				sumPK += agentList.get(i).getPI();
+			}
+		}
+		totalS =
 		//pE =
     }
 
