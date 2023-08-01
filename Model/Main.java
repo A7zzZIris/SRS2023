@@ -674,16 +674,22 @@ public class Main extends SimModelImpl {
         // agg demand - for all agents - demand for ethnic goods under different prices
         // can use prev aggregate supply - iterate through all ethnic entrepreneurs -> calc using production function
         // price = 0.5 -> 0.6
-        int totalD;
-        double totalS;
-        double sumPK = 0;
+        int totalD = 0;
+        double totalS = 0;
+        //double sumPK = 0;
         //calc totalS
         for (int i = 0; i < agentList.size(); i++) {
             if (agentList.get(i).getRace() == 2 && agentList.get(i).getcurOccupation() == 1) { //ethnic entrepreneurs
-                sumPK += agentList.get(i).getPI();
+                double agentKI = agentList.get(i).getK();
+                double sumPK = 0;
+                ArrayList<Agent> employees = agentList.get(i).getEmployees();
+                for (int j = 0; j < employees.size(); j++) {
+                    sumPK += employees.get(j).getPI();
+                }
+                totalS += Math.pow(agentKI, alpha)*Math.pow(sumPK, 1 - alpha);
+                System.out.println(totalS);
             }
         }
-        totalS = *Math.pow(sumPK, 1 - alpha);
         //pE =
     }
 
