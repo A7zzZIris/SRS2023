@@ -114,8 +114,8 @@ public class Main extends SimModelImpl {
             // record every round agents' average ethnic percentage for the neighborhood
             // percentages of entrepreneurs by race
             // measure of segregation
-            //data1.record();
-            //data1.write();
+            data1.record();
+            data1.write();
         }
     }
 
