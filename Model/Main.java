@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.Comparator;
 
 import uchicago.src.sim.analysis.DataRecorder;
+import uchicago.src.sim.analysis.NumericDataSource;
 import uchicago.src.sim.engine.BasicAction;
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.engine.SimModelImpl;
@@ -50,6 +51,7 @@ public class Main extends SimModelImpl {
     private double gammaE;
     private double gammaEA;
     private double theta;
+    private double totalS, totalD;
 
     private DataRecorder data1;
 
@@ -225,6 +227,10 @@ public class Main extends SimModelImpl {
             agentList.add(ag);
 
         }
+
+        data1 = new DataRecorder("/Users/m/Desktop/output.txt", this);
+        data1.addNumericDataSource("Aggregate Supply", new getTotalS());
+        data1.addNumericDataSource("Aggregate Demand", new getTotalD());
     }
 
     //step1 Consider the occupation
@@ -618,7 +624,6 @@ public class Main extends SimModelImpl {
             if (agentList.get(i).getcurOccupation() == 4) {
                 num += 1;
             }
-            ;
         }
         unemployment = num / numAgents;
     }
@@ -657,7 +662,6 @@ public class Main extends SimModelImpl {
             sumP += a.getPI();
             sumW += wage;
         }
-
         double numerator = sumW + r * agent.getK();
         double denominator = alpha * Math.pow(sumP, beta) * agent.getXI();
         double k = Math.pow(numerator / denominator, 1 / (alpha - 1));
@@ -674,10 +678,9 @@ public class Main extends SimModelImpl {
         // agg demand - for all agents - demand for ethnic goods under different prices
         // can use prev aggregate supply - iterate through all ethnic entrepreneurs -> calc using production function
         // price = 0.5 -> 0.6
-        int totalD = 0;
-        double totalS = 0;
-        //double sumPK = 0;
-        //calc totalS
+        totalD = 0;
+        totalS = 0;
+        //calc totalS / fixed supply
         for (int i = 0; i < agentList.size(); i++) {
             if (agentList.get(i).getRace() == 2 && agentList.get(i).getcurOccupation() == 1) { //ethnic entrepreneurs
                 double agentKI = agentList.get(i).getK();
@@ -687,17 +690,32 @@ public class Main extends SimModelImpl {
                     sumPK += employees.get(j).getPI();
                 }
                 totalS += Math.pow(agentKI, alpha)*Math.pow(sumPK, 1 - alpha);
-                System.out.println(totalS);
+                System.out.println("Aggregate Supply: "+totalS);
             }
         }
+        //calc totalD
+        // both ethnic and native
+        // iterate through all agents, take into account utility
+        // amount of ethnic good that would maximize utility
+        for(int i = 0; i < agentList.size(); i++){
+            if(agentList.get(i).getRace()==1){ //native
+                totalD += agentList.get(i).getPI*gammaN/pE;
+            }
+            else{ //ethnic
+                totalD += agentList.get(i).getPI*gammaE/pE;
+            }
+        }
+        // change price -> change in demand
+        // compare S/D
         //pE =
+        // y = price
+
     }
 
 
     public int getGridHeight() {
         return gridHeight;
     }
-
     public void setGridHeight(int n) {
         this.gridHeight = n;
     }
@@ -813,5 +831,23 @@ public class Main extends SimModelImpl {
 
     public void setTheta(double theta) {
         this.theta = theta;
+    }
+
+    public double getTotalD(){
+        return totalD;
+    }
+
+    class getTotalS implements NumericDataSource{
+        @Override
+        public double execute() {
+            return totalS;
+        }
+    }
+
+    class getTotalD implements NumericDataSource{
+        @Override
+        public double execute() {
+            return totalD;
+        }
     }
 }

@@ -1,7 +1,9 @@
 package SRS2023.Model;
 //package Model;
+
 import uchicago.src.sim.gui.Drawable;
 import uchicago.src.sim.gui.SimGraphics;
+
 import java.awt.Color;
 import java.util.ArrayList;
 
@@ -20,10 +22,10 @@ public class Agent implements Drawable {
     private double pI; // productivity
     private double bI; // wealth to start the business
     private double K; // current capital
-    
+
     private int cE; // amount for ethnic good
     private int cG; // amount for general good
-    
+
 
     public void setID(int id) {
         this.id = id;
@@ -33,9 +35,13 @@ public class Agent implements Drawable {
         return id;
     }
 
-    public void setRace(int race) { this.race = race;}
+    public void setRace(int race) {
+        this.race = race;
+    }
 
-    public int getRace() { return race;}
+    public int getRace() {
+        return race;
+    }
 
     public void setCoords(int[] coords) {
         this.coords = coords;
@@ -92,6 +98,7 @@ public class Agent implements Drawable {
     public void setBI(double bI) {
         this.bI = bI;
     }
+
     public double getK() {
         return K;
     }
@@ -115,6 +122,7 @@ public class Agent implements Drawable {
     public ArrayList<Agent> getEmployees() {
         return employees;
     }
+
     public void addApplicants(Agent applicant) {
         this.applicants.add(applicant);
     }
@@ -122,44 +130,45 @@ public class Agent implements Drawable {
     public ArrayList<Agent> getApplicants() {
         return applicants;
     }
+
     public void cleanApplicants() {
         applicants.clear();
     }
+
     public void removeEmployee(Agent agent) {
-    	employees.remove(agent);
+        employees.remove(agent);
     }
-    
+
     public int getdemandE() {
-    	return cE;
+        return cE;
     }
+
     public void setdemandE(int cE) {
-    	this.cE = cE;
+        this.cE = cE;
     }
+
     public int getdemandG() {
-    	return cG;
+        return cG;
     }
+
     public void setdemandG(int cG) {
-    	this.cG = cG;
+        this.cG = cG;
     }
 
 
-    
-    
     @Override
     public void draw(SimGraphics simGraphics) {
         //key: different shades to signify native/ethnic, entrepreneur, employed, unemployed
-        if(this.race == 1){//native
+        if (this.race == 1) {//native
             //Occupation 1 is "Entrepreneur", 2 is "Work in Native Firm", 3 is "Work in  Ethnic Firm", 4 is "unemployed"
-            if(this.cur_occupation == 1){//entrepreneur
+            if (this.cur_occupation == 1) {//entrepreneur
                 //simGraphics.drawFastRoundRect(new Color());
             }
             simGraphics.drawFastRoundRect(Color.RED);
-        }
-        else{//ethnic
-            if(this.cur_occupation==1){
+        } else {//ethnic
+            if (this.cur_occupation == 1) {
 
-            }
-            else if(this.cur_occupation==2){
+            } else if (this.cur_occupation == 2) {
 
             }
             simGraphics.drawFastRoundRect(Color.BLUE);
