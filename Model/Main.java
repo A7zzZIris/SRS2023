@@ -111,7 +111,7 @@ public class Main extends SimModelImpl {
             hireProcess();
             updateUnemployment();
             updateCapital();
-            System.out.println(1);
+            //System.out.println(1);
             // record every round agents' average ethnic percentage for the neighborhood
             // percentages of entrepreneurs by race
             // measure of segregation
@@ -187,7 +187,6 @@ public class Main extends SimModelImpl {
             ag.setBI(b_i);
             agentList.add(ag);
         }
-
 
         //randomly allocate the native
         for (int id = numEthnic; id < numEthnic+numNative; id++) {
