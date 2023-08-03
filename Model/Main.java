@@ -111,6 +111,7 @@ public class Main extends SimModelImpl {
             hireProcess();
             updateUnemployment();
             updateCapital();
+            System.out.println(1);
             // record every round agents' average ethnic percentage for the neighborhood
             // percentages of entrepreneurs by race
             // measure of segregation
@@ -153,14 +154,13 @@ public class Main extends SimModelImpl {
             int max = gridHeight;
             int randomY = (int) (Math.random() * (max - min)) + min;
             int randomX = (int) (Math.random() * gridWidth);
-            System.out.println("here " + String.valueOf(randomX) + " " + String.valueOf(randomY));
-
+            //System.out.println("here " + String.valueOf(randomX) + " " + String.valueOf(randomY));
 
             while (Grid.getObjectAt(randomX, randomY) != null) {
                 randomY = (int) (Math.random() * (max - min)) + min;
                 randomX = (int) (Math.random() * gridWidth);
             }
-            System.out.println(String.valueOf(randomX) + " " + String.valueOf(randomY));
+            //System.out.println(String.valueOf(randomX) + " " + String.valueOf(randomY));
             Grid.putObjectAt(randomX, randomY, ag);
 
             //Allocate agents uniform randomly to initial occupations, all workers will unemployed and entrepreneurs will have no employees yet.
@@ -190,7 +190,8 @@ public class Main extends SimModelImpl {
 
 
         //randomly allocate the native
-        for (int id = numEthnic; id < numNative; id++) {
+        for (int id = numEthnic; id < numEthnic+numNative; id++) {
+            System.out.println("id" + id);
             Agent ag = new Agent();
             ag.setID(id);
             //Race 1 refers to majority
@@ -619,6 +620,7 @@ public class Main extends SimModelImpl {
     //Step3:calculate and update the new unemployment rate
 
     public void updateUnemployment() {
+        System.out.println(agentList.size());
         double num = 0;
         for (int i = 0; i < numAgents; i++) {
             if (agentList.get(i).getcurOccupation() == 4) {
@@ -735,6 +737,8 @@ public class Main extends SimModelImpl {
                 totalD += agentList.get(i).getCurrPayoff()*gammaE/pE;
             }
         }
+        System.out.println("Aggregate Supply: " + totalS);
+        System.out.println("Aggregate Demand: " + totalD);
         // change price -> change in demand
         // compare S/D
         //pE =
@@ -865,14 +869,12 @@ public class Main extends SimModelImpl {
 
 
     class getTotalS implements NumericDataSource{
-        @Override
         public double execute() {
             return totalS;
         }
     }
 
     class getTotalD implements NumericDataSource{
-        @Override
         public double execute() {
             return totalD;
         }
