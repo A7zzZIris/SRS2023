@@ -26,6 +26,7 @@ public class Agent implements Drawable {
     private int cE; // amount for ethnic good
     private int cG; // amount for general good
 
+    private double currPayoff;
 
     public void setID(int id) {
         this.id = id;
@@ -154,6 +155,10 @@ public class Agent implements Drawable {
     public void setdemandG(int cG) {
         this.cG = cG;
     }
+
+    public double getCurrPayoff() {return this.currPayoff;}
+
+    public void setCurrPayoff(double p) {this.currPayoff = p;}
 
 
     @Override

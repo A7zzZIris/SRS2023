@@ -668,6 +668,35 @@ public class Main extends SimModelImpl {
         agent.setK(k);
     }
 
+    public void updatePayoff(Agent a){
+        int race = a.getRace();
+        //native = 1, ethnic = 2
+        int occupation = a.getcurOccupation();
+        double payoff;
+        //Occupation 1 is "Entrepreneur", 2 is "Work in Native Firm", 3 is "Work in  Ethnic Firm", 4 is "unemployed"
+        if(race == 1){
+            if (occupation==1){
+                a.setCurrPayoff(computeEntrepreneurPayoff(a));
+            } else if (occupation==2) {
+                a.setCurrPayoff(computeWorkinNativePayoff(a));
+            } else if (occupation==3) {
+                a.setCurrPayoff(computeWorkinEthnicPayoff(a));
+            } else { // unemployed
+                a.setCurrPayoff(computeUnemployedPayoff(a));
+            }
+        } else {
+            if (occupation==1){
+                a.setCurrPayoff(computeEntrepreneurPayoff(a));
+            } else if (occupation==2) {
+                a.setCurrPayoff(computeWorkinNativePayoff(a));
+            } else if (occupation==3) {
+                a.setCurrPayoff(computeWorkinEthnicPayoff(a));
+            } else { // unemployed
+                a.setCurrPayoff(computeUnemployedPayoff(a));
+            }
+        }
+
+    }
     //step5: update the price of ethnic good
 
     //4.3 compute total supply and demand
@@ -682,6 +711,7 @@ public class Main extends SimModelImpl {
         totalS = 0;
         //calc totalS / fixed supply
         for (int i = 0; i < agentList.size(); i++) {
+            updatePayoff(agentList.get(i));
             if (agentList.get(i).getRace() == 2 && agentList.get(i).getcurOccupation() == 1) { //ethnic entrepreneurs
                 double agentKI = agentList.get(i).getK();
                 double sumPK = 0;
@@ -699,10 +729,10 @@ public class Main extends SimModelImpl {
         // amount of ethnic good that would maximize utility
         for(int i = 0; i < agentList.size(); i++){
             if(agentList.get(i).getRace()==1){ //native
-                totalD += agentList.get(i).getPI*gammaN/pE;
+                totalD += agentList.get(i).getCurrPayoff()*gammaN/pE;
             }
             else{ //ethnic
-                totalD += agentList.get(i).getPI*gammaE/pE;
+                totalD += agentList.get(i).getCurrPayoff()*gammaE/pE;
             }
         }
         // change price -> change in demand
@@ -833,9 +863,6 @@ public class Main extends SimModelImpl {
         this.theta = theta;
     }
 
-    public double getTotalD(){
-        return totalD;
-    }
 
     class getTotalS implements NumericDataSource{
         @Override
