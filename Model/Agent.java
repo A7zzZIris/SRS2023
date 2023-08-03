@@ -1,5 +1,6 @@
-package SRS2023.Model;
-//package Model;
+
+//package SRS2023.Model;
+package Model;
 
 import uchicago.src.sim.gui.Drawable;
 import uchicago.src.sim.gui.SimGraphics;

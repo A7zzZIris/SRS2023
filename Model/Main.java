@@ -1,8 +1,12 @@
-package SRS2023.Model;
-//package Model;
+//package SRS2023.Model;
+package Model;
 
-import SRS2023.Model.Agent;
-//import Model.Agent;
+//import SRS2023.Model.Agent;
+import Model.Agent;
+
+//import SRS2023.Model.Agent;
+
+
 
 import java.util.Arrays;
 import java.util.Vector;
@@ -81,22 +85,46 @@ public class Main extends SimModelImpl {
     public void setup() {
         // TODO Auto-generated method stub
         agentList = new ArrayList<Agent>();
-        period = 1000;
+        period = 1;
         gridWidth = 50;
         gridHeight = 50;
-        occupancy = 0.8;
+        occupancy = 0.6;
         minorityShares = 0.3;
         numAgents = (int) (gridWidth * gridHeight * occupancy);
-        System.out.println("Num Agents: " + numAgents);
+        
         numEthnic = (int) (numAgents * minorityShares);
-        System.out.println("Ethnic: " + numEthnic);
+        
         numNative = numAgents - numEthnic;
-        System.out.println("Native: " + numNative);
+        
+        r = 0.1; //interest rate
+        B = 2; //outside option
+        pE = 0.8; //price of ethnic good
+       // private double averp; // workers' average productivity
+        alpha = 0.4;
+        beta = 0.5;
+        betaN = 0.5;
+        betaNE = 0.4; //bargaining power
+        betaEE = 0.3; //bargaining power
+        lambdaO = 0.8;
+        gammaN = 0.3;
+        gammaE = 0.7;
+        gammaEA = 0.5;
+        theta = 5;
+        
+        
+        
+        
+        
         schedule = new Schedule(1);
         dsurf = new DisplaySurface(this, "test");
         registerDisplaySurface("test", dsurf);
         DisplayConstants.CELL_WIDTH = 50;
         DisplayConstants.CELL_HEIGHT = 50;
+        
+        
+        System.out.println("Num Agents: " + numAgents);
+        System.out.println("Ethnic: " + numEthnic);
+        System.out.println("Native: " + numNative);
     }
 
     public void buildSchedule() {
@@ -107,16 +135,22 @@ public class Main extends SimModelImpl {
     class eachPeriod extends BasicAction {
         public void execute() {
             updateOccupationChoice();
+
             updateApplications();
+
             hireProcess();
+  
             updateUnemployment();
+            //System.out.println(unemployment);
+
             updateCapital();
+   
             //System.out.println(1);
             // record every round agents' average ethnic percentage for the neighborhood
             // percentages of entrepreneurs by race
             // measure of segregation
-            data1.record();
-            data1.write();
+            //data1.record();
+            //data1.write();
         }
     }
 
@@ -137,6 +171,8 @@ public class Main extends SimModelImpl {
 
     public void buildModel() {
         Grid = new Object2DGrid(gridWidth, gridHeight);
+        double sumP = 0.0;
+        
         //randomly allocate the minority
         for (int id = 0; id < numEthnic; id++) {
             Agent ag = new Agent();
@@ -185,7 +221,9 @@ public class Main extends SimModelImpl {
             ag.setCI(c_i);
             ag.setPI(p_i);
             ag.setBI(b_i);
+            
             agentList.add(ag);
+            sumP+= p_i;
         }
 
         //randomly allocate the native
@@ -224,20 +262,37 @@ public class Main extends SimModelImpl {
             ag.setCI(c_i);
             ag.setPI(p_i);
             ag.setBI(b_i);
+            
             agentList.add(ag);
+            sumP+= p_i;
 
         }
+        
+        averp = sumP/numAgents;
 
-        data1 = new DataRecorder("/Users/m/Desktop/output.txt", this);
-        data1.addNumericDataSource("Aggregate Supply", new getTotalS());
-        data1.addNumericDataSource("Aggregate Demand", new getTotalD());
+        //data1 = new DataRecorder("/Users/cynicism/Desktop/output.txt", this);
+        //data1.addNumericDataSource("Aggregate Supply", new getTotalS());
+        //data1.addNumericDataSource("Aggregate Demand", new getTotalD());
     }
 
     //step1 Consider the occupation
     public void updateOccupationChoice() {
+    	
+    	
+    	
         for (int i = 0; i < agentList.size(); i++) {
             double random = Math.random();
             Agent agent = agentList.get(i);
+            
+            
+            
+            System.out.println("id: " + i);
+            System.out.println("Race: "+ agent.getRace());
+            System.out.println("cur:"+agent.getcurOccupation());
+            System.out.println("next:"+agent.getSwitchOccupation());
+           
+            
+            
             if (random < lambdaO) {
                 Agent boss = agent.getBoss();
                 int next = considerOccupation(agent);
@@ -254,8 +309,14 @@ public class Main extends SimModelImpl {
                 }
             } else {
                 agent.setSwitchOccupation(agent.getcurOccupation());
+                System.out.println();
+                
             }
+            
+            
         }
+
+        
     }
 
 
@@ -272,6 +333,20 @@ public class Main extends SimModelImpl {
         //missing a condition: utility is the same
         double[] numbers = {u1, u2, u3, u4};
         double max = Arrays.stream(numbers).max().getAsDouble();
+        
+        
+        System.out.println("Payoff:");
+        System.out.println("Entrepreneur:"+computeEntrepreneurPayoff(agent));
+        System.out.println("WorkinNative:"+computeWorkinNativePayoff(agent));
+        System.out.println("WorkinEthnic:"+computeWorkinEthnicPayoff(agent));
+        System.out.println("Unemployed:"+computeUnemployedPayoff(agent));
+        System.out.println("Utility:");
+        System.out.println("Entrepreneur:"+u1);
+        System.out.println("WorkinNative:"+u2);
+        System.out.println("WorkinEthnic:"+u3);
+        System.out.println("Unemployed:"+u4);
+        System.out.println();
+        
         if (max == u1) {
             return 1;
         } else if (max == u2) {
@@ -281,6 +356,8 @@ public class Main extends SimModelImpl {
         } else {
             return 4;
         }
+     
+      
     }
 
 
@@ -306,6 +383,9 @@ public class Main extends SimModelImpl {
 
         double n = Math.pow(numeratorN / denominatorN, exponentN);
         double k = Math.pow(numeratorK / denominatorK, exponentK);
+        
+      
+       
 
         if (agent.getRace() == 1) {
             n = Math.pow(numeratorN / denominatorN, exponentN);
@@ -316,15 +396,16 @@ public class Main extends SimModelImpl {
             k = Math.pow((pE * numeratorK) / denominatorK, exponentK);
         }
         double payoff = x * Math.pow(averp, beta) * Math.pow(k, alpha) * Math.pow(n, beta) - n * wage - r * k;
-
+  
         return payoff;
     }
 
 
     public double computeWorkinNativePayoff(Agent agent) {
         double wage = betaN * B + (1 - betaN) * (agent.getPI());
-        //double investments = r * a.getBI();
         double payoff = (1 - unemployment) * wage + unemployment * B + r * agent.getBI();
+        
+        
         return payoff;
     }
 
@@ -344,22 +425,21 @@ public class Main extends SimModelImpl {
         //two conditions: native individuals and ethnic individuals
         double u;
         if (agent.getRace() == 1) {
-            int cNE;
-            int cNG;
+            double cNE;
+            double cNG;
 
-            cNE = (int) ((budget * gammaN) / pE);
-            cNG = (int) ((1 - gammaN) * budget);
+            cNE = (budget * gammaN) / pE;
+            cNG = (1 - gammaN) * budget;
             u = Math.pow(cNE, gammaN) * Math.pow(cNG, 1 - gammaN);
-
+       
         } else {
-            int cEE;
-            int cEG;
+            double cEE;
+            double cEG;
 
-            cEE = (int) ((budget * gammaE) / pE);
-            cEG = (int) ((1 - gammaE) * budget);
+            cEE = (budget * gammaE) / pE;
+            cEG = (1 - gammaE) * budget;
             u = Math.pow(cEE, gammaE) * Math.pow(cEG, 1 - gammaE);
 
-            return u;
         }
 
 
@@ -374,19 +454,21 @@ public class Main extends SimModelImpl {
         double u;
 
         if (agent.getRace() == 1) {
-            int cNE;
-            int cNG;
+            double cNE;
+            double cNG;
 
-            cNE = (int) ((budget * gammaN) / pE);
-            cNG = (int) ((1 - gammaN) * budget);
+            cNE = (budget * gammaN) / pE;
+            cNG = (1 - gammaN) * budget;
             u = Math.pow(cNE, gammaN) * Math.pow(cNG, 1 - gammaN);
+            
+          
 
         } else {
-            int cEE;
-            int cEG;
+            double cEE;
+            double cEG;
             double x;
-            cEE = (int) ((budget * gammaEA) / pE);
-            cEG = (int) ((1 - gammaEA) * budget);
+            cEE = ((budget * gammaEA) / pE);
+            cEG = (1 - gammaEA) * budget;
 
             Vector<Agent> neighborlist;
             neighborlist = Grid.getMooreNeighbors(agent.getCoords()[0], agent.getCoords()[1], false);
@@ -409,12 +491,12 @@ public class Main extends SimModelImpl {
 
     public double computeWorkinEthnicUtility(double budget, double pE, Agent agent) {
         //Only ethnic individuals can become workers in ethnic firms
-        int cEE;
-        int cEG;
+        double cEE;
+        double cEG;
         double u;
 
-        cEE = (int) ((budget * gammaE) / pE);
-        cEG = (int) ((1 - gammaE) * budget);
+        cEE = (budget * gammaE) / pE;
+        cEG = (1 - gammaE) * budget;
         u = Math.pow(cEE, gammaE) * Math.pow(cEG, 1 - gammaE);
 
         return u;
@@ -427,19 +509,19 @@ public class Main extends SimModelImpl {
         //two conditions: native individuals and ethnic individuals
 
         if (agent.getRace() == 1) {
-            int cNE;
-            int cNG;
+            double cNE;
+            double cNG;
 
-            cNE = (int) ((budget * gammaN) / pE);
-            cNG = (int) ((1 - gammaN) * budget);
+            cNE = (budget * gammaN) / pE;
+            cNG = (1 - gammaN) * budget;
             u = Math.pow(cNE, gammaN) * Math.pow(cNG, 1 - gammaN);
 
         } else {
-            int cEE;
-            int cEG;
+            double cEE;
+            double cEG;
 
-            cEE = (int) ((budget * gammaE) / pE);
-            cEG = (int) ((1 - gammaE) * budget);
+            cEE = (budget * gammaE) / pE;
+            cEG = (1 - gammaE) * budget;
             u = Math.pow(cEE, gammaE) * Math.pow(cEG, 1 - gammaE);
         }
 
