@@ -111,17 +111,12 @@ public class Main extends SimModelImpl {
         gammaEA = 0.5;
         theta = 5;
         
-        
-        
-        
-        
         schedule = new Schedule(1);
         dsurf = new DisplaySurface(this, "test");
         registerDisplaySurface("test", dsurf);
         DisplayConstants.CELL_WIDTH = 50;
         DisplayConstants.CELL_HEIGHT = 50;
-        
-        
+
         System.out.println("Num Agents: " + numAgents);
         System.out.println("Ethnic: " + numEthnic);
         System.out.println("Native: " + numNative);
@@ -178,19 +173,12 @@ public class Main extends SimModelImpl {
             ag.setID(id);
             //Race 1 refers to native and 2 refers to ethnic
             ag.setRace(2);
-
-            //double x_i = Math.random();//Entrepreneurial spirit/ability
-            //double c_i = Math.random(); //Cost of assimilation
-            //double p_i = Math.random(); //Productivity as a worker
-            //double b_i = Math.random(); //Wealth used to be starting a business
-
             //ethnic minorities will be located in the lower third of the lattice.
             int min = (int) (gridHeight * (2.0 / 3.0));
             int max = gridHeight;
             int randomY = (int) (Math.random() * (max - min)) + min;
             int randomX = (int) (Math.random() * gridWidth);
             //System.out.println("here " + String.valueOf(randomX) + " " + String.valueOf(randomY));
-
             while (Grid.getObjectAt(randomX, randomY) != null) {
                 randomY = (int) (Math.random() * (max - min)) + min;
                 randomX = (int) (Math.random() * gridWidth);
@@ -212,10 +200,10 @@ public class Main extends SimModelImpl {
                 ag.setSwitchOccupation(3);
             }
             ag.setCoords(new int[]{randomX, randomY});
-            ag.setXI(Math.random());
-            ag.setCI(Math.random());
-            ag.setPI(Math.random());
-            ag.setBI(Math.random());
+            ag.setXI(Math.random()); //Entrepreneurial spirit/ability
+            ag.setCI(Math.random()); //Cost of Assimilation
+            ag.setPI(Math.random()); //Productivity
+            ag.setBI(Math.random()); //Capital
             
             agentList.add(ag);
             sumP+= ag.getPI();
@@ -228,7 +216,6 @@ public class Main extends SimModelImpl {
             ag.setID(id);
             //Race 1 refers to majority
             ag.setRace(1);
-
             double x_i = Math.random();//Entrepreneurial spirit/ability
             double c_i = Math.random(); //Cost of assimilation
             double p_i = Math.random(); //Productivity as a worker
