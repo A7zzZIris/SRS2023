@@ -11,7 +11,7 @@ public class Agent implements Drawable {
     private int id;
     private int race;
     private int[] coords;
-    private int cur_occupation;
+    private int curOcupation;
     private int switch_occupation;
     private Agent boss; //?
     private ArrayList<Agent> employees = new ArrayList<>();
@@ -52,12 +52,12 @@ public class Agent implements Drawable {
         return coords;
     }
 
-    public void setcurOccupation(int cur_occupation) {
-        this.cur_occupation = cur_occupation;
+    public void setcurOccupation(int curOcupation) {
+        this.curOcupation = curOcupation;
     }
 
     public int getcurOccupation() {
-        return cur_occupation;
+        return curOcupation;
     }
 
     public void setSwitchOccupation(int switch_occupation) {
@@ -166,14 +166,14 @@ public class Agent implements Drawable {
         //key: different shades to signify native/ethnic, entrepreneur, employed, unemployed
         if (this.race == 1) {//native
             //Occupation 1 is "Entrepreneur", 2 is "Work in Native Firm", 3 is "Work in  Ethnic Firm", 4 is "unemployed"
-            if (this.cur_occupation == 1) {//entrepreneur
+            if (this.curOcupation == 1) {//entrepreneur
                 //simGraphics.drawFastRoundRect(new Color());
             }
             simGraphics.drawFastRoundRect(Color.RED);
         } else {//ethnic
-            if (this.cur_occupation == 1) {
+            if (this.curOcupation == 1) {
 
-            } else if (this.cur_occupation == 2) {
+            } else if (this.curOcupation == 2) {
 
             }
             simGraphics.drawFastRoundRect(Color.BLUE);

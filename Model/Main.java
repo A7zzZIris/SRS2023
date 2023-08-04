@@ -20,7 +20,7 @@ import uchicago.src.sim.engine.BasicAction;
 import uchicago.src.sim.engine.Schedule;
 import uchicago.src.sim.engine.SimModelImpl;
 import uchicago.src.sim.gui.DisplayConstants;
-import uchicago.src.sim.gui.Drawable;
+//import uchicago.src.sim.gui.Drawable;
 import uchicago.src.sim.gui.Object2DDisplay;
 import uchicago.src.sim.gui.DisplaySurface;
 import uchicago.src.sim.space.Object2DGrid;
@@ -189,7 +189,6 @@ public class Main extends SimModelImpl {
             double random = Math.random();
             //String occupation;
             //Occupation 1 is "Entrepreneur", 2 is "Work in Native Firm", 3 is "Work in  Ethnic Firm", 4 is "unemployed"
-            //gonna change this one after max change the agent class
             if (random < 1.0 / 3) {
                 ag.setcurOccupation(1);
             } else if (1.0 / 3 <= random && random < 2.0 / 3) {
@@ -204,7 +203,6 @@ public class Main extends SimModelImpl {
             ag.setCI(Math.random()); //Cost of Assimilation
             ag.setPI(Math.random()); //Productivity
             ag.setBI(Math.random()); //Capital
-            
             agentList.add(ag);
             sumP+= ag.getPI();
         }
@@ -214,12 +212,7 @@ public class Main extends SimModelImpl {
             System.out.println("id" + id);
             Agent ag = new Agent();
             ag.setID(id);
-            //Race 1 refers to majority
-            ag.setRace(1);
-            double x_i = Math.random();//Entrepreneurial spirit/ability
-            double c_i = Math.random(); //Cost of assimilation
-            double p_i = Math.random(); //Productivity as a worker
-            double b_i = Math.random(); //Wealth used to be starting a business
+            ag.setRace(1); //native
             int randomX = (int) (Math.random() * gridWidth); // random X
             int randomY = (int) (Math.random() * gridHeight); // random Y
             while (Grid.getObjectAt(randomX, randomY) != null) {
@@ -227,27 +220,23 @@ public class Main extends SimModelImpl {
                 randomY = (int) (Math.random() * gridHeight);
             }
             Grid.putObjectAt(randomX, randomY, ag);
-
             //Allocate agents uniform randomly to initial occupations, all workers will unemployed and entrepreneurs will have no employees yet.
             double random = Math.random();
             //String occupation;
             if (random < 1.0 / 2) {
                 ag.setcurOccupation(1);
-
             } else {
                 ag.setcurOccupation(4);
                 ag.setSwitchOccupation(2);
             }
-
             ag.setCoords(new int[]{randomX, randomY});
-            ag.setXI(x_i);
-            ag.setCI(c_i);
-            ag.setPI(p_i);
-            ag.setBI(b_i);
+            ag.setXI(Math.random()); //Entrepreneurial spirit/ability
+            ag.setCI(Math.random()); //Cost of Assimilation
+            ag.setPI(Math.random()); //Productivity
+            ag.setBI(Math.random()); //Capital
             
             agentList.add(ag);
-            sumP+= p_i;
-
+            sumP+= ag.getPI();
         }
         
         averp = sumP/numAgents;
@@ -259,21 +248,14 @@ public class Main extends SimModelImpl {
 
     //step1 Consider the occupation
     public void updateOccupationChoice() {
-    	
-    	
-    	
         for (int i = 0; i < agentList.size(); i++) {
             double random = Math.random();
             Agent agent = agentList.get(i);
-            
-            
             
             System.out.println("id: " + i);
             System.out.println("Race: "+ agent.getRace());
             System.out.println("cur:"+agent.getcurOccupation());
             System.out.println("next:"+agent.getSwitchOccupation());
-           
-            
             
             if (random < lambdaO) {
                 Agent boss = agent.getBoss();
@@ -292,15 +274,9 @@ public class Main extends SimModelImpl {
             } else {
                 agent.setSwitchOccupation(agent.getcurOccupation());
                 System.out.println();
-                
             }
-            
-            
         }
-
-        
     }
-
 
     public int considerOccupation(Agent agent) {
         double u1 = computeEntrepreneurUtility(computeEntrepreneurPayoff(agent), pE, agent);
@@ -315,7 +291,6 @@ public class Main extends SimModelImpl {
         //missing a condition: utility is the same
         double[] numbers = {u1, u2, u3, u4};
         double max = Arrays.stream(numbers).max().getAsDouble();
-        
         
         System.out.println("Payoff:");
         System.out.println("Entrepreneur:"+computeEntrepreneurPayoff(agent));
@@ -376,13 +351,11 @@ public class Main extends SimModelImpl {
         return payoff;
     }
 
-
     public double computeWorkinNativePayoff(Agent agent) {
         double wage = betaN * B + (1 - betaN) * (agent.getPI());
         double payoff = (1 - unemployment) * wage + unemployment * B + r * agent.getBI();
         return payoff;
     }
-
 
     public double computeWorkinEthnicPayoff(Agent agent) {
         double wage = betaEE * B + (1 - betaEE) * agent.getPI();
@@ -501,7 +474,6 @@ public class Main extends SimModelImpl {
             return ethnicJobsearch(agent);
         }
     }
-
 
     //In this function, the input agent is the native individual that looking for the firms,
 //and it will return the entrepreneur that the agent chooses to send the application
@@ -711,31 +683,25 @@ public class Main extends SimModelImpl {
         totalD = 0;
         totalS = 0;
         //calc totalS / fixed supply
-        for (int i = 0; i < agentList.size(); i++) {
-            updatePayoff(agentList.get(i));
-            if (agentList.get(i).getRace() == 2 && agentList.get(i).getcurOccupation() == 1) { //ethnic entrepreneurs
-                double agentKI = agentList.get(i).getK();
+        for (Agent a : agentList) {
+            updatePayoff(a);
+            if (a.getRace() == 2 && a.getcurOccupation() == 1) { //ethnic entrepreneurs
+                double agentKI = a.getK();
                 double sumPK = 0;
-                ArrayList<Agent> employees = agentList.get(i).getEmployees();
-                for (int j = 0; j < employees.size(); j++) {
-                    sumPK += employees.get(j).getPI();
-                }
-                totalS += Math.pow(agentKI, alpha)*Math.pow(sumPK, 1 - alpha);
-                System.out.println("Aggregate Supply: "+totalS);
+                ArrayList<Agent> employees = a.getEmployees();
+                for (Agent employee : employees) sumPK += employee.getPI();
+                totalS += Math.pow(agentKI, alpha) * Math.pow(sumPK, 1 - alpha);
+                System.out.println("Aggregate Supply: " + totalS);
             }
         }
         //calc totalD
         // both ethnic and native
         // iterate through all agents, take into account utility
         // amount of ethnic good that would maximize utility
-        for(int i = 0; i < agentList.size(); i++){
-            if(agentList.get(i).getRace()==1){ //native
-                totalD += agentList.get(i).getCurrPayoff()*gammaN/pE;
-            }
-            else{ //ethnic
-                totalD += agentList.get(i).getCurrPayoff()*gammaE/pE;
-            }
-        }
+        for (Agent agent : agentList)
+            if (agent.getRace() == 1) totalD += agent.getCurrPayoff() * gammaN / pE; //native
+            else totalD += agent.getCurrPayoff() * gammaE / pE; //ethnic
+
         System.out.println("Aggregate Supply: " + totalS);
         System.out.println("Aggregate Demand: " + totalD);
         // change price -> change in demand
