@@ -35,7 +35,7 @@ public class Main extends SimModelImpl {
     private int gridWidth;
     private int gridHeight;
     private int numAgents;
-    private double minorityShares;
+    private double minorityShare;
     private int numEthnic;
     private int numNative;
     private int period;
@@ -56,6 +56,7 @@ public class Main extends SimModelImpl {
     private double gammaEA;
     private double theta;
     private double totalS, totalD;
+    private boolean init;
 
     private DataRecorder data1;
 
@@ -89,10 +90,10 @@ public class Main extends SimModelImpl {
         gridWidth = 50;
         gridHeight = 50;
         occupancy = 0.6;
-        minorityShares = 0.3;
+        minorityShare = 0.3;
         numAgents = (int) (gridWidth * gridHeight * occupancy);
         
-        numEthnic = (int) (numAgents * minorityShares);
+        numEthnic = (int) (numAgents * minorityShare);
         
         numNative = numAgents - numEthnic;
         
@@ -117,6 +118,7 @@ public class Main extends SimModelImpl {
         DisplayConstants.CELL_WIDTH = 50;
         DisplayConstants.CELL_HEIGHT = 50;
 
+        init = true;
         System.out.println("Num Agents: " + numAgents);
         System.out.println("Ethnic: " + numEthnic);
         System.out.println("Native: " + numNative);
@@ -129,7 +131,8 @@ public class Main extends SimModelImpl {
 
     class eachPeriod extends BasicAction {
         public void execute() {
-            updateOccupationChoice();
+            if(!init) updateOccupationChoice();
+            else init = false;
 
             updateApplications();
 
@@ -408,15 +411,15 @@ public class Main extends SimModelImpl {
             cEE = ((budget * gammaEA) / pE);
             cEG = (1 - gammaEA) * budget;
 
-            Vector<Agent> neighborlist;
-            neighborlist = Grid.getMooreNeighbors(agent.getCoords()[0], agent.getCoords()[1], false);
+            Vector<Agent> neighborList;
+            neighborList = Grid.getMooreNeighbors(agent.getCoords()[0], agent.getCoords()[1], false);
             double assimilation = 0;
-            for (int i = 0; i < neighborlist.size(); i++) {
-                if (neighborlist.get(i).getSwitchOccupation() == 2 && neighborlist.get(i).getRace() == 2) {
+            for (int i = 0; i < neighborList.size(); i++) {
+                if (neighborList.get(i).getSwitchOccupation() == 2 && neighborList.get(i).getRace() == 2) {
                     assimilation += 1;
                 }
             }
-            x = assimilation / neighborlist.size();
+            x = assimilation / neighborList.size();
             u = Math.pow(cEE, gammaEA) * Math.pow(cEG, 1 - gammaEA) + theta * x;
         }
         return u;
@@ -469,15 +472,15 @@ public class Main extends SimModelImpl {
 // It will return the entrepreneur that he gonna send the application to.
     public Agent jobSearch(Agent agent) {
         if (agent.getSwitchOccupation() == 2) {
-            return nativeJobsearch(agent);
+            return nativeJobSearch(agent);
         } else {
-            return ethnicJobsearch(agent);
+            return ethnicJobSearch(agent);
         }
     }
 
     //In this function, the input agent is the native individual that looking for the firms,
 //and it will return the entrepreneur that the agent chooses to send the application
-    public Agent nativeJobsearch(Agent agent) {
+    public Agent nativeJobSearch(Agent agent) {
         ArrayList<Agent> firms = new ArrayList<Agent>();
         for (int i = 0; i < numAgents; i++) {
             if (agentList.get(i).getRace() == 1 && agentList.get(i).getSwitchOccupation() == 1) {
@@ -490,7 +493,7 @@ public class Main extends SimModelImpl {
 
 //in this function, the input agent is the ethnic individual that looking for the firms, 
 //and it will return the entrepreneur that the agent chooses to send the application
-    public Agent ethnicJobsearch(Agent agent) {
+    public Agent ethnicJobSearch(Agent agent) {
         ArrayList<Agent> firms = new ArrayList<Agent>();
         int x = agent.getCoords()[0];
         int y = agent.getCoords()[0];
@@ -585,8 +588,7 @@ public class Main extends SimModelImpl {
 
     static class AgentIDComparator implements Comparator<Agent> {
         @Override
-        public int compare(Agent agent1, Agent agent2) {
-            // 根据 Agent 的 productivity 属性进行比较
+        public int compare(Agent agent1, Agent agent2) { // 根据 Agent 的 productivity 属性进行比较
             return Double.compare(agent1.getPI(), agent2.getPI());
         }
     }
@@ -813,6 +815,9 @@ public class Main extends SimModelImpl {
     public void setTheta(double theta) {
         this.theta = theta;
     }
+
+    public double getMinorityShare() {return minorityShare;}
+    public void setMinorityShare(double m) {minorityShare = m;}
 
     class getTotalS implements NumericDataSource{
         public double execute() {
