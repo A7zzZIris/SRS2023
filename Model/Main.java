@@ -1,10 +1,10 @@
-package SRS2023.Model;
-//package Model;
-
-import SRS2023.Model.Agent;
-//import Model.Agent;
+//package SRS2023.Model;
+package Model;
 
 //import SRS2023.Model.Agent;
+import Model.Agent;
+
+
 
 
 
@@ -58,6 +58,7 @@ public class Main extends SimModelImpl {
     private double totalS, totalD;
     private boolean init;
 
+
     private DataRecorder data1;
 
     @Override
@@ -90,29 +91,29 @@ public class Main extends SimModelImpl {
         gridWidth = 50;
         gridHeight = 50;
         occupancy = 0.6;
+
         minorityShare = 0.3;
-        numAgents = (int) (gridWidth * gridHeight * occupancy);
-        
-        numEthnic = (int) (numAgents * minorityShare);
-        
-        numNative = numAgents - numEthnic;
-        
-        r = 0.1; //interest rate
-        B = 2; //outside option
-        pE = 0.8; //price of ethnic good
-       // private double averp; // workers' average productivity
+        r = 0.1; 
+        B = 2; 
+        pE = 0.8; 
         alpha = 0.4;
         beta = 0.5;
         betaN = 0.5;
-        betaNE = 0.4; //bargaining power
-        betaEE = 0.3; //bargaining power
+        betaNE = 0.4; 
+        betaEE = 0.3; 
         lambdaO = 0.8;
         gammaN = 0.3;
         gammaE = 0.7;
         gammaEA = 0.5;
         theta = 5;
+
+        numAgents = (int) (gridWidth * gridHeight * occupancy);
+        numEthnic = (int) (numAgents * minorityShare);
+        numNative = numAgents - numEthnic;
+
         
         schedule = new Schedule(1);
+        
         dsurf = new DisplaySurface(this, "test");
         registerDisplaySurface("test", dsurf);
         DisplayConstants.CELL_WIDTH = 50;
@@ -131,19 +132,20 @@ public class Main extends SimModelImpl {
 
     class eachPeriod extends BasicAction {
         public void execute() {
+
             if(!init) updateOccupationChoice();
             else init = false;
 
+            System.out.println("finish updateOccupationChoice");
             updateApplications();
-
+            System.out.println("finish updateApplications");
             hireProcess();
-  
+            System.out.println("finish hireProcess");
             updateUnemployment();
-            //System.out.println(unemployment);
-
+            System.out.println("finish updateUnemployment");
             updateCapital();
-   
-            //System.out.println(1);
+            System.out.println("finish updateCapital");
+ 
             // record every round agents' average ethnic percentage for the neighborhood
             // percentages of entrepreneurs by race
             // measure of segregation
@@ -194,6 +196,7 @@ public class Main extends SimModelImpl {
             //Occupation 1 is "Entrepreneur", 2 is "Work in Native Firm", 3 is "Work in  Ethnic Firm", 4 is "unemployed"
             if (random < 1.0 / 3) {
                 ag.setcurOccupation(1);
+                ag.setSwitchOccupation(1);
             } else if (1.0 / 3 <= random && random < 2.0 / 3) {
                 ag.setcurOccupation(4);
                 ag.setSwitchOccupation(2);
@@ -212,12 +215,14 @@ public class Main extends SimModelImpl {
 
         //randomly allocate the native
         for (int id = numEthnic; id < numEthnic+numNative; id++) {
-            System.out.println("id" + id);
+            //System.out.println("id" + id);
             Agent ag = new Agent();
             ag.setID(id);
+
             ag.setRace(1); //native
             int randomX = (int) (Math.random() * gridWidth); // random X
             int randomY = (int) (Math.random() * gridHeight); // random Y
+
             while (Grid.getObjectAt(randomX, randomY) != null) {
                 randomX = (int) (Math.random() * gridWidth);
                 randomY = (int) (Math.random() * gridHeight);
@@ -225,9 +230,10 @@ public class Main extends SimModelImpl {
             Grid.putObjectAt(randomX, randomY, ag);
             //Allocate agents uniform randomly to initial occupations, all workers will unemployed and entrepreneurs will have no employees yet.
             double random = Math.random();
-            //String occupation;
+
             if (random < 1.0 / 2) {
                 ag.setcurOccupation(1);
+                ag.setSwitchOccupation(1);
             } else {
                 ag.setcurOccupation(4);
                 ag.setSwitchOccupation(2);
@@ -264,6 +270,7 @@ public class Main extends SimModelImpl {
                 Agent boss = agent.getBoss();
                 int next = considerOccupation(agent);
                 agent.setSwitchOccupation(next);
+                //System.out.println(agent.getSwitchOccupation());
 
                 //cut the link with its boss if its current occupation is a worker and gonna change the job
                 if (agent.getSwitchOccupation() != agent.getcurOccupation() && boss != null) {
@@ -278,7 +285,11 @@ public class Main extends SimModelImpl {
                 agent.setSwitchOccupation(agent.getcurOccupation());
                 System.out.println();
             }
+
+            
         }
+     
+
     }
 
     public int considerOccupation(Agent agent) {
@@ -457,18 +468,24 @@ public class Main extends SimModelImpl {
     }
 
 //step 2.1: sending the applications.
-//This method iterate through every agent, and the individuals that want to switch to the workers will send the application to the entrepreneur.
+//This method iterate through every agent, and the individuals that want to switch to the workers 
+//will send the application to the entrepreneur.
     public void updateApplications() {
         for (int i = 0; i < agentList.size(); i++) {
             if (agentList.get(i).getSwitchOccupation() == 2 || agentList.get(i).getSwitchOccupation() == 3) {
                 Agent agent = agentList.get(i);
+              //  System.out.println("id:"+ i);
+              //  System.out.println("race:"+agentList.get(i).getRace());
                 Agent boss = jobSearch(agent);
-                boss.addApplicants(agent); //send the application
+                if (boss!= null) {
+                	boss.addApplicants(agent); 
+                }
+                
             }
         }
     }
 
-    //the agent search for job in different ways, according to their races.
+//the agent search for job in different ways, according to their races.
 // It will return the entrepreneur that he gonna send the application to.
     public Agent jobSearch(Agent agent) {
         if (agent.getSwitchOccupation() == 2) {
@@ -478,11 +495,18 @@ public class Main extends SimModelImpl {
         }
     }
 
-    //In this function, the input agent is the native individual that looking for the firms,
+
+
+//In this function, the input agent is the native individual that looking for the firms,
 //and it will return the entrepreneur that the agent chooses to send the application
     public Agent nativeJobSearch(Agent agent) {
         ArrayList<Agent> firms = new ArrayList<Agent>();
         for (int i = 0; i < numAgents; i++) {
+        	//debug to see the occupation
+        	//if (agentList.get(i).getRace() == 1) {
+        	//	System.out.println(i + ": Job:" +agentList.get(i).getSwitchOccupation());
+        	//}
+        	
             if (agentList.get(i).getRace() == 1 && agentList.get(i).getSwitchOccupation() == 1) {
                 firms.add(agentList.get(i));
             }
@@ -517,11 +541,19 @@ public class Main extends SimModelImpl {
             }
         }
         // randomly choose one entrepreneur within all the potential choices, and update the entreprenuer's applications
-        int random = (int) (Math.random() * firms.size());
-        System.out.println(firms.size());
-        Agent boss = firms.get(random);
-        boss.addApplicants(agent);
-        return boss;
+
+        if (firms.size()==0) {
+        	agent.setcurOccupation(4); // become unemployed?
+        	return null;
+        }
+        else {
+        	 int random = (int) (Math.random() * firms.size());
+             Agent boss = firms.get(random);
+             boss.addApplicants(agent);
+             return boss;
+        }
+       
+
     }
 
     // step2.2: Enterpreneur's decision
