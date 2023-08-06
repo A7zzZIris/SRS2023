@@ -1,5 +1,5 @@
-//package SRS2023.Model;
-package Model;
+package SRS2023.Model;
+//package Model;
 
 import uchicago.src.sim.gui.Drawable;
 import uchicago.src.sim.gui.SimGraphics;
@@ -11,7 +11,7 @@ public class Agent implements Drawable {
     private int id;
     private int race;
     private int[] coords;
-    private int curOcupation;
+    private int curOccupation;
     private int switch_occupation;
     private Agent boss; //?
     private ArrayList<Agent> employees = new ArrayList<>();
@@ -53,11 +53,11 @@ public class Agent implements Drawable {
     }
 
     public void setcurOccupation(int curOcupation) {
-        this.curOcupation = curOcupation;
+        this.curOccupation = curOcupation;
     }
 
     public int getcurOccupation() {
-        return curOcupation;
+        return curOccupation;
     }
 
     public void setSwitchOccupation(int switch_occupation) {
@@ -166,14 +166,14 @@ public class Agent implements Drawable {
         //key: different shades to signify native/ethnic, entrepreneur, employed, unemployed
         if (this.race == 1) {//native
             //Occupation 1 is "Entrepreneur", 2 is "Work in Native Firm", 3 is "Work in  Ethnic Firm", 4 is "unemployed"
-            if (this.curOcupation == 1) {//entrepreneur
+            if (this.curOccupation == 1) {//entrepreneur
                 //simGraphics.drawFastRoundRect(new Color());
             }
             simGraphics.drawFastRoundRect(Color.RED);
         } else {//ethnic
-            if (this.curOcupation == 1) {
+            if (this.curOccupation == 1) {
 
-            } else if (this.curOcupation == 2) {
+            } else if (this.curOccupation == 2) {
 
             }
             simGraphics.drawFastRoundRect(Color.BLUE);

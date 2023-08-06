@@ -1,12 +1,8 @@
-//package SRS2023.Model;
-package Model;
+package SRS2023.Model;
+//package Model;
 
-//import SRS2023.Model.Agent;
-import Model.Agent;
-
-
-
-
+import SRS2023.Model.Agent;
+//import Model.Agent;
 
 import java.util.Arrays;
 import java.util.Vector;
@@ -26,7 +22,6 @@ import uchicago.src.sim.gui.DisplaySurface;
 import uchicago.src.sim.space.Object2DGrid;
 
 public class Main extends SimModelImpl {
-
     private ArrayList<Agent> agentList;
     // private ArrayList agentList = new ArrayList<Agent>();
     private Schedule schedule;
@@ -57,7 +52,6 @@ public class Main extends SimModelImpl {
     private double theta;
     private double totalS, totalD;
     private boolean init;
-
 
     private DataRecorder data1;
 
@@ -111,7 +105,6 @@ public class Main extends SimModelImpl {
         numEthnic = (int) (numAgents * minorityShare);
         numNative = numAgents - numEthnic;
 
-        
         schedule = new Schedule(1);
         
         dsurf = new DisplaySurface(this, "test");
@@ -132,7 +125,6 @@ public class Main extends SimModelImpl {
 
     class eachPeriod extends BasicAction {
         public void execute() {
-
             if(!init) updateOccupationChoice();
             else init = false;
 
@@ -142,15 +134,15 @@ public class Main extends SimModelImpl {
             hireProcess();
             System.out.println("finish hireProcess");
             updateUnemployment();
-            System.out.println("finish updateUnemployment");
+            System.out.println("unemployment: " + unemployment);
             updateCapital();
             System.out.println("finish updateCapital");
- 
+            updatePrice();
             // record every round agents' average ethnic percentage for the neighborhood
             // percentages of entrepreneurs by race
             // measure of segregation
-            //data1.record();
-            //data1.write();
+            data1.record();
+            data1.write();
         }
     }
 
@@ -250,9 +242,9 @@ public class Main extends SimModelImpl {
         
         averp = sumP/numAgents;
 
-        //data1 = new DataRecorder("/Users/cynicism/Desktop/output.txt", this);
-        //data1.addNumericDataSource("Aggregate Supply", new getTotalS());
-        //data1.addNumericDataSource("Aggregate Demand", new getTotalD());
+        data1 = new DataRecorder("/Users/m/Desktop/output.txt", this);
+        data1.addNumericDataSource("Aggregate Supply", new getTotalS());
+        data1.addNumericDataSource("Aggregate Demand", new getTotalD());
     }
 
     //step1 Consider the occupation
@@ -285,11 +277,7 @@ public class Main extends SimModelImpl {
                 agent.setSwitchOccupation(agent.getcurOccupation());
                 System.out.println();
             }
-
-            
         }
-     
-
     }
 
     public int considerOccupation(Agent agent) {
@@ -676,6 +664,7 @@ public class Main extends SimModelImpl {
         double denominator = alpha * Math.pow(sumP, beta) * agent.getXI();
         double k = Math.pow(numerator / denominator, 1 / (alpha - 1));
         agent.setK(k);
+        System.out.println("k: " + k);
     }
 
     public void updatePayoff(Agent a){
@@ -719,6 +708,7 @@ public class Main extends SimModelImpl {
         // price = 0.5 -> 0.6
         totalD = 0;
         totalS = 0;
+        System.out.println(1);
         //calc totalS / fixed supply
         for (Agent a : agentList) {
             updatePayoff(a);
@@ -728,6 +718,8 @@ public class Main extends SimModelImpl {
                 ArrayList<Agent> employees = a.getEmployees();
                 for (Agent employee : employees) sumPK += employee.getPI();
                 totalS += Math.pow(agentKI, alpha) * Math.pow(sumPK, 1 - alpha);
+                System.out.println("AgentKI: "+agentKI);
+                System.out.println("Alpha: " + alpha);
                 System.out.println("Aggregate Supply: " + totalS);
             }
         }
