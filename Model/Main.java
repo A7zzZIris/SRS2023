@@ -487,7 +487,9 @@ public class Main extends SimModelImpl {
                 firms.add(agentList.get(i));
             }
         }
+        System.out.println("size of firms: " + firms.size());
         int random = (int) (Math.random() * firms.size());
+        System.out.println("random" + random);
         return firms.get(random);
     }
 
@@ -516,6 +518,7 @@ public class Main extends SimModelImpl {
         }
         // randomly choose one entrepreneur within all the potential choices, and update the entreprenuer's applications
         int random = (int) (Math.random() * firms.size());
+        System.out.println(firms.size());
         Agent boss = firms.get(random);
         boss.addApplicants(agent);
         return boss;
