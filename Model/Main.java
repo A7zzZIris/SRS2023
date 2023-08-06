@@ -1,8 +1,8 @@
-package SRS2023.Model;
-//package Model;
+//package SRS2023.Model;
+package Model;
 
-import SRS2023.Model.Agent;
-//import Model.Agent;
+//import SRS2023.Model.Agent;
+import Model.Agent;
 
 import java.util.Arrays;
 import java.util.Vector;
@@ -130,8 +130,22 @@ public class Main extends SimModelImpl {
 
             System.out.println("finish updateOccupationChoice");
             updateApplications();
+            
+            
             System.out.println("finish updateApplications");
+            
+            
+           
+            
             hireProcess();
+            
+           // for ( int i = 0;i<agentList.size();i++) {
+            	//if (agentList.get(i).getcurOccupation()==1) {
+            	//	System.out.println("id"+ i);
+            	//	System.out.println("employees:"+agentList.get(i).getEmployees().size());
+            	//	System.out.println("applicants:"+agentList.get(i).getApplicants().size());
+            	//}
+           // }
             System.out.println("finish hireProcess");
             updateUnemployment();
             System.out.println("unemployment: " + unemployment);
@@ -201,6 +215,8 @@ public class Main extends SimModelImpl {
             ag.setCI(Math.random()); //Cost of Assimilation
             ag.setPI(Math.random()); //Productivity
             ag.setBI(Math.random()); //Capital
+            ag.setK(ag.getBI());
+            //System.out.println(ag.getK());
             agentList.add(ag);
             sumP+= ag.getPI();
         }
@@ -235,6 +251,7 @@ public class Main extends SimModelImpl {
             ag.setCI(Math.random()); //Cost of Assimilation
             ag.setPI(Math.random()); //Productivity
             ag.setBI(Math.random()); //Capital
+            ag.setK(ag.getBI());
             
             agentList.add(ag);
             sumP+= ag.getPI();
@@ -270,9 +287,9 @@ public class Main extends SimModelImpl {
                     boss.removeEmployee(agent);
                 }
                 //initialize Entrepreneurs' capital;
-                if (agent.getSwitchOccupation() != agent.getcurOccupation() && agent.getSwitchOccupation() == 1) {
-                    agent.setK(agent.getBI());
-                }
+                //if (agent.getSwitchOccupation() != agent.getcurOccupation() && agent.getSwitchOccupation() == 1) {
+                   // agent.setK(agent.getBI());
+                //}
             } else {
                 agent.setSwitchOccupation(agent.getcurOccupation());
                 System.out.println();
@@ -569,12 +586,18 @@ public class Main extends SimModelImpl {
             ArrayList<Agent> curEmployees = agent.getEmployees();
             ArrayList<Agent> newEmployees = new ArrayList<>(curEmployees);  // a copy of curEmployees
             newEmployees.add(a);
+            System.out.println(curEmployees.size());
+            System.out.println(newEmployees.size());
             //compare the payoff
             double payoff0 = payoff(agent, curEmployees);
             double payoff1 = payoff(agent, newEmployees);
+            System.out.println("payoff0:"+payoff0);
+            System.out.println("payoff1:"+payoff1);
             if (payoff0 > payoff1) {
                 a.setcurOccupation(4); //applicant becomes unemployed.
+                System.out.println("not hire");
             } else {
+            	System.out.println("yes hire");
                 agent.addEmployee(a);
                 a.setBoss(agent);
                 a.setcurOccupation(a.getSwitchOccupation());
@@ -588,6 +611,7 @@ public class Main extends SimModelImpl {
         double sumW = 0.0;
         double sumP = 0.0;
         double payoff;
+        
         for (Agent a : workers) {
             double wage;
             if (a.getRace() == 1 && agent.getRace() == 1) {
@@ -601,8 +625,17 @@ public class Main extends SimModelImpl {
             sumP += a.getPI();
             sumW += wage;
         }
+        
         if (agent.getRace() == 1) {
+        	//System.out.println("k:"+agent.getK());
+        	//System.out.println("alpha:"+alpha);
+        	//System.out.println("sumP:"+sumP);
+        	//System.out.println("sumW:"+sumW);
+        	//System.out.println("size:"+workers.size());
+        	//System.out.println(agent.getXI() * Math.pow(agent.getK(), alpha) * Math.pow(sumP, beta) );
+        	//System.out.println(r * agent.getK());
             payoff = agent.getXI() * Math.pow(agent.getK(), alpha) * Math.pow(sumP, beta) - sumW - r * agent.getK();
+   
         } else {
             payoff = pE * agent.getXI() * Math.pow(agent.getK(), alpha) * Math.pow(sumP, beta) - sumW - r * agent.getK();
         }
@@ -647,6 +680,7 @@ public class Main extends SimModelImpl {
         double sumW = 0.0;
         double sumP = 0.0;
         ArrayList<Agent> employees = agent.getEmployees();
+        //System.out.println("employees:"+employees.size());
         for (Agent a : employees) {
             double wage;
             if (a.getRace() == 1 && agent.getRace() == 1) {
@@ -662,6 +696,11 @@ public class Main extends SimModelImpl {
         }
         double numerator = sumW + r * agent.getK();
         double denominator = alpha * Math.pow(sumP, beta) * agent.getXI();
+       // System.out.println("sumW:"+sumW);
+        //System.out.println("r:"+r);
+        //System.out.println("k:"+agent.getK());
+       // System.out.println(numerator);
+       // System.out.println(denominator);
         double k = Math.pow(numerator / denominator, 1 / (alpha - 1));
         agent.setK(k);
         System.out.println("k: " + k);
