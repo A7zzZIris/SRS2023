@@ -59,7 +59,7 @@ public class Main extends SimModelImpl {
     public void begin() {
         buildModel();
         buildSchedule();
-        buildDisplay();
+        //buildDisplay();
     }
 
     @Override
@@ -155,8 +155,8 @@ public class Main extends SimModelImpl {
             // record every round agents' average ethnic percentage for the neighborhood
             // percentages of entrepreneurs by race
             // measure of segregation
-            //data1.record();
-            //data1.write();
+            data1.record();
+            data1.write();
         }
     }
 
@@ -259,9 +259,10 @@ public class Main extends SimModelImpl {
         
         averp = sumP/numAgents;
 
-        //data1 = new DataRecorder("/Users/m/Desktop/output.txt", this);
-        //data1.addNumericDataSource("Aggregate Supply", new getTotalS());
-        //data1.addNumericDataSource("Aggregate Demand", new getTotalD());
+        data1 = new DataRecorder("/Users/m/Desktop/output.txt", this);
+        data1.addNumericDataSource("Supply", new getTotalS());
+        data1.addNumericDataSource("Demand", new getTotalD());
+        data1.addNumericDataSource("Price", new getPrice());
     }
 
     //step1 Consider the occupation
@@ -775,18 +776,18 @@ public class Main extends SimModelImpl {
         System.out.println("Initial Demand: " + totalD);
         System.out.println("Initial Error" +Math.abs(totalS-totalD)/totalS);
         while(Math.abs(totalS-totalD)/totalS > 0.1){
-            if(totalD>totalS) pE += 1;
-            else pE -= 1;
+            if(totalD>totalS) pE += 100;
+            else pE -= 100;
             updateDemand();
-            System.out.println("Supply: " + totalS);
-            System.out.println("Demand: " + totalD);
-            System.out.println("Error: " +Math.abs(totalS-totalD)/totalS);
-            System.out.println("Price: " + pE);
+            //System.out.println("Supply: " + totalS);
+            //System.out.println("Demand: " + totalD);
+            //System.out.println("Error: " +Math.abs(totalS-totalD)/totalS);
+            //System.out.println("Price: " + pE);
         }
 
         System.out.println("Final Supply: " + totalS);
         System.out.println("Final Demand: " + totalD);
-        System.out.println("Final Price" + pE);
+        System.out.println("Final Price: " + pE);
         // change price -> change in demand
         // compare S/D
         //pE =
@@ -921,5 +922,9 @@ public class Main extends SimModelImpl {
         public double execute() {
             return totalD;
         }
+    }
+
+    class getPrice implements NumericDataSource{
+        public double execute() {return pE;}
     }
 }
