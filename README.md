@@ -22,7 +22,6 @@ updateCapital();
 updatePrice();
 ```
 
-
 ## Step1: updateOccupationChoice()
 #### Variables that will be updated within the method:
 ```
@@ -32,23 +31,23 @@ agent.SwitchOccupation
 ```public int considerOccupation(Agent agent)```
 This method will first compute different payoffs, then use them to compute and compare the utilities, and return the occupation choices that have maximum utility for the given agent.
 
-``` computeEntrepreneurPayoff(Agent agent)```
-This method will compute the payoff of being an entrepreneur for the given agent.
+The functions below will compute agents' different payoffs for different occupational choices.
 
-```computeWorkinNativePayoff(Agent agent)```This method will compute the payoff of working in the native firms for the given agent.
+``` 
+computeEntrepreneurPayoff(Agent agent)
+computeWorkinNativePayoff(Agent agent)
+computeWorkinEthnicPayoff(Agent agent)
+computeUnemployedPayoff(Agent agent)
+```
 
-```computeWorkinEthnicPayoff(Agent agent) ```This method will compute the payoff of working in the ethnic firms for the given agent.
-```computeUnemployedPayoff(Agent agent) ```This method will compute the payoff of being unemployed for the given agent.
+The functions below will compute agents' different utilitiess for different occupational choices.
 
-```computeEntrepreneurUtility(double budget, double pE, Agent agent)```This method will compute the utility of being an entrepreneur for the given agent, given price, and given budget.
-
-```computeWorkinNativeUtility(double budget, double pE, Agent agent)```
-This method will compute the utility of being a worker in the native firm for the given agent, given price, and given budget.
-
-```computeWorkinEthnicUtility(double budget, double pE, Agent agent)```
-This method will compute the utility of being a worker in the ethnic firm for the given agent, given price, and given budget.
-
-```computeUnemployedUtility(double budget, double pE, Agent agent)```This method will compute the utility of being unemployed for the given agent, given price, and given budget.
+```
+computeEntrepreneurUtility(double budget, double pE, Agent agent)
+computeWorkinNativeUtility(double budget, double pE, Agent agent)
+computeWorkinEthnicUtility(double budget, double pE, Agent agent)
+computeUnemployedUtility(double budget, double pE, Agent agent)
+```
 
 ## Step2.1: updateApplications();
 #### Variables that will be updated within the method:
