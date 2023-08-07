@@ -1,8 +1,8 @@
-//package SRS2023.Model;
-package Model;
+package SRS2023.Model;
+//package Model;
 
-//import SRS2023.Model.Agent;
-import Model.Agent;
+import SRS2023.Model.Agent;
+//import Model.Agent;
 
 import java.util.Arrays;
 import java.util.Vector;
@@ -770,12 +770,38 @@ public class Main extends SimModelImpl {
             if (agent.getRace() == 1) totalD += agent.getCurrPayoff() * gammaN / pE; //native
             else totalD += agent.getCurrPayoff() * gammaE / pE; //ethnic
 
-        System.out.println("Aggregate Supply: " + totalS);
-        System.out.println("Aggregate Demand: " + totalD);
+        updateDemand();
+        System.out.println("Initial Supply: " + totalS);
+        System.out.println("Initial Demand: " + totalD);
+        System.out.println("Initial Error" +Math.abs(totalS-totalD)/totalS);
+        while(Math.abs(totalS-totalD)/totalS > 0.1){
+            if(totalD>totalS) pE += 1;
+            else pE -= 1;
+            updateDemand();
+            System.out.println("Supply: " + totalS);
+            System.out.println("Demand: " + totalD);
+            System.out.println("Error: " +Math.abs(totalS-totalD)/totalS);
+            System.out.println("Price: " + pE);
+        }
+
+        System.out.println("Final Supply: " + totalS);
+        System.out.println("Final Demand: " + totalD);
+        System.out.println("Final Price" + pE);
         // change price -> change in demand
         // compare S/D
         //pE =
         // y = price
+    }
+
+    public void updateDemand(){
+        //calc totalD
+        // both ethnic and native
+        // iterate through all agents, take into account utility
+        // amount of ethnic good that would maximize utility
+        totalD = 0;
+        for (Agent agent : agentList)
+            if (agent.getRace() == 1) totalD += agent.getCurrPayoff() * gammaN / pE; //native
+            else totalD += agent.getCurrPayoff() * gammaE / pE; //ethnic
     }
 
     public int getGridHeight() {
