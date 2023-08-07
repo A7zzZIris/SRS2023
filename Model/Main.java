@@ -90,8 +90,8 @@ public class Main extends SimModelImpl {
         r = 0.1; 
         B = 2; 
         pE = 0.8; 
-        alpha = 0.4;
-        beta = 0.5;
+        alpha = 0.2;
+        beta = 0.7;
         betaN = 0.5;
         betaNE = 0.4; 
         betaEE = 0.3; 
@@ -155,8 +155,8 @@ public class Main extends SimModelImpl {
             // record every round agents' average ethnic percentage for the neighborhood
             // percentages of entrepreneurs by race
             // measure of segregation
-            data1.record();
-            data1.write();
+            //data1.record();
+            //data1.write();
         }
     }
 
@@ -211,7 +211,7 @@ public class Main extends SimModelImpl {
                 ag.setSwitchOccupation(3);
             }
             ag.setCoords(new int[]{randomX, randomY});
-            ag.setXI(Math.random()); //Entrepreneurial spirit/ability
+            ag.setXI(Math.random()*10); //Entrepreneurial spirit/ability
             ag.setCI(Math.random()); //Cost of Assimilation
             ag.setPI(Math.random()); //Productivity
             ag.setBI(Math.random()); //Capital
@@ -247,7 +247,7 @@ public class Main extends SimModelImpl {
                 ag.setSwitchOccupation(2);
             }
             ag.setCoords(new int[]{randomX, randomY});
-            ag.setXI(Math.random()); //Entrepreneurial spirit/ability
+            ag.setXI(Math.random()*10); //Entrepreneurial spirit/ability
             ag.setCI(Math.random()); //Cost of Assimilation
             ag.setPI(Math.random()); //Productivity
             ag.setBI(Math.random()); //Capital
@@ -259,9 +259,9 @@ public class Main extends SimModelImpl {
         
         averp = sumP/numAgents;
 
-        data1 = new DataRecorder("/Users/m/Desktop/output.txt", this);
-        data1.addNumericDataSource("Aggregate Supply", new getTotalS());
-        data1.addNumericDataSource("Aggregate Demand", new getTotalD());
+        //data1 = new DataRecorder("/Users/m/Desktop/output.txt", this);
+        //data1.addNumericDataSource("Aggregate Supply", new getTotalS());
+        //data1.addNumericDataSource("Aggregate Demand", new getTotalD());
     }
 
     //step1 Consider the occupation
