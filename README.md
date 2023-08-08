@@ -73,7 +73,7 @@ boss.addApplicants(agent);
 agent.boss 
 agent.curOccupation;
 
-# for agents who want to be workers
+# for agents who want to be entreprenuers
 agent.applicants (change to be empty)
 agent.employees
 ```
