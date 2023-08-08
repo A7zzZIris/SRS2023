@@ -127,18 +127,10 @@ public class Main extends SimModelImpl {
         public void execute() {
             if(!init) updateOccupationChoice();
             else init = false;
-
             System.out.println("finish updateOccupationChoice");
             updateApplications();
-            
-            
             System.out.println("finish updateApplications");
-            
-            
-           
-            
             hireProcess();
-            
            // for ( int i = 0;i<agentList.size();i++) {
             	//if (agentList.get(i).getcurOccupation()==1) {
             	//	System.out.println("id"+ i);
@@ -263,6 +255,7 @@ public class Main extends SimModelImpl {
         data1.addNumericDataSource("Supply", new getTotalS());
         data1.addNumericDataSource("Demand", new getTotalD());
         data1.addNumericDataSource("Price", new getPrice());
+        //average wage, commenting files, record as much info as possible, averages
     }
 
     //step1 Consider the occupation
@@ -512,7 +505,6 @@ public class Main extends SimModelImpl {
         	//if (agentList.get(i).getRace() == 1) {
         	//	System.out.println(i + ": Job:" +agentList.get(i).getSwitchOccupation());
         	//}
-        	
             if (agentList.get(i).getRace() == 1 && agentList.get(i).getSwitchOccupation() == 1) {
                 firms.add(agentList.get(i));
             }
@@ -528,7 +520,7 @@ public class Main extends SimModelImpl {
     public Agent ethnicJobSearch(Agent agent) {
         ArrayList<Agent> firms = new ArrayList<Agent>();
         int x = agent.getCoords()[0];
-        int y = agent.getCoords()[0];
+        int y = agent.getCoords()[1];
         int radius = 2;
         //make sure the coordinates are inside the boundaries of the grid.
         int minX = Math.max(x - radius, 0);
@@ -746,7 +738,7 @@ public class Main extends SimModelImpl {
         // agg demand - for all agents - demand for ethnic goods under different prices
         // can use prev aggregate supply - iterate through all ethnic entrepreneurs -> calc using production function
         // price = 0.5 -> 0.6
-        totalD = 0;
+        //totalD = 0;
         totalS = 0;
         System.out.println(1);
         //calc totalS / fixed supply
