@@ -3,14 +3,8 @@
 
 ## Changlog:
 
-Updated params.
-
-I think we should modify Agent so that it directly corresponds to the variables, might make it easier later on when working with the equations.
-
-
-
-
-
+<<<<<<< HEAD
+=======
 
 # Overview of the Method
 ```
@@ -73,7 +67,7 @@ boss.addApplicants(agent);
 agent.boss 
 agent.curOccupation;
 
-# for agents who want to be workers
+# for agents who want to be entreprenuers
 agent.applicants (change to be empty)
 agent.employees
 ```
@@ -104,3 +98,4 @@ agent.K
 ```
 pE
 ```
+>>>>>>> 2426115dbc93b3732982c75bf7ccfa3348565f6f

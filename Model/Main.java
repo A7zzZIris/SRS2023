@@ -59,7 +59,7 @@ public class Main extends SimModelImpl {
     public void begin() {
         buildModel();
         buildSchedule();
-        buildDisplay();
+        //buildDisplay();
     }
 
     @Override
@@ -129,7 +129,6 @@ public class Main extends SimModelImpl {
             else init = false;
             updateApplications();
             hireProcess();
-            
            // for ( int i = 0;i<agentList.size();i++) {
             	//if (agentList.get(i).getcurOccupation()==1) {
             	//	System.out.println("id"+ i);
@@ -143,8 +142,8 @@ public class Main extends SimModelImpl {
             // record every round agents' average ethnic percentage for the neighborhood
             // percentages of entrepreneurs by race
             // measure of segregation
-            //data1.record();
-            //data1.write();
+            data1.record();
+            data1.write();
         }
     }
 
@@ -254,9 +253,11 @@ public class Main extends SimModelImpl {
         
         averp = sumP/numAgents;
 
-        //data1 = new DataRecorder("/Users/m/Desktop/output.txt", this);
-        //data1.addNumericDataSource("Aggregate Supply", new getTotalS());
-        //data1.addNumericDataSource("Aggregate Demand", new getTotalD());
+        data1 = new DataRecorder("/Users/m/Desktop/output.txt", this);
+        data1.addNumericDataSource("Supply", new getTotalS());
+        data1.addNumericDataSource("Demand", new getTotalD());
+        data1.addNumericDataSource("Price", new getPrice());
+        //average wage, commenting files, record as much info as possible, averages
     }
 
 
@@ -556,6 +557,12 @@ public class Main extends SimModelImpl {
     public Agent nativeJobSearch(Agent agent) {
         ArrayList<Agent> firms = new ArrayList<Agent>();
         for (int i = 0; i < numAgents; i++) {
+
+        	//debug to see the occupation
+        	//if (agentList.get(i).getRace() == 1) {
+        	//	System.out.println(i + ": Job:" +agentList.get(i).getSwitchOccupation());
+        	//}
+
             if (agentList.get(i).getRace() == 1 && agentList.get(i).getSwitchOccupation() == 1) {
                 firms.add(agentList.get(i));
             }
@@ -586,7 +593,7 @@ public class Main extends SimModelImpl {
     public Agent ethnicJobSearch(Agent agent) {
         ArrayList<Agent> firms = new ArrayList<Agent>();
         int x = agent.getCoords()[0];
-        int y = agent.getCoords()[0];
+        int y = agent.getCoords()[1];
         int radius = 2;
         //make sure the coordinates are inside the boundaries of the grid.
         int minX = Math.max(x - radius, 0);
@@ -841,7 +848,7 @@ public class Main extends SimModelImpl {
         // agg demand - for all agents - demand for ethnic goods under different prices
         // can use prev aggregate supply - iterate through all ethnic entrepreneurs -> calc using production function
         // price = 0.5 -> 0.6
-        totalD = 0;
+        //totalD = 0;
         totalS = 0;
         System.out.println(1);
         //calc totalS / fixed supply
@@ -871,18 +878,18 @@ public class Main extends SimModelImpl {
         System.out.println("Initial Demand: " + totalD);
         System.out.println("Initial Error" +Math.abs(totalS-totalD)/totalS);
         while(Math.abs(totalS-totalD)/totalS > 0.1){
-            if(totalD>totalS) pE += 1;
-            else pE -= 1;
+            if(totalD>totalS) pE += 100;
+            else pE -= 100;
             updateDemand();
-            System.out.println("Supply: " + totalS);
-            System.out.println("Demand: " + totalD);
-            System.out.println("Error: " +Math.abs(totalS-totalD)/totalS);
-            System.out.println("Price: " + pE);
+            //System.out.println("Supply: " + totalS);
+            //System.out.println("Demand: " + totalD);
+            //System.out.println("Error: " +Math.abs(totalS-totalD)/totalS);
+            //System.out.println("Price: " + pE);
         }
 
         System.out.println("Final Supply: " + totalS);
         System.out.println("Final Demand: " + totalD);
-        System.out.println("Final Price" + pE);
+        System.out.println("Final Price: " + pE);
         // change price -> change in demand
         // compare S/D
         //pE =
@@ -1017,5 +1024,9 @@ public class Main extends SimModelImpl {
         public double execute() {
             return totalD;
         }
+    }
+
+    class getPrice implements NumericDataSource{
+        public double execute() {return pE;}
     }
 }
