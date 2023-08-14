@@ -1,5 +1,4 @@
 package SRS2023.Model;
-import SRS2023.Model.Main;
 
 // package Model;
 // import Model.Agent;
@@ -53,7 +52,9 @@ public class Main extends SimModelImpl {
     private double gammaEA;
     private double theta;
     private double totalS, totalD;
-    private boolean init;
+    private boolean init; //first period
+
+    public double[] percentages;
 
     private DataRecorder data1;
 
@@ -244,11 +245,21 @@ public class Main extends SimModelImpl {
 
         averp = sumP / numAgents;
 
+        percentages = getPercentages();
+
         data1 = new DataRecorder("/Users/m/Desktop/output.txt", this);
         data1.addNumericDataSource("Supply", new getTotalS());
         data1.addNumericDataSource("Demand", new getTotalD());
         data1.addNumericDataSource("Price", new getPrice());
         data1.addNumericDataSource("Average Payoff", new getAverageWage());
+        data1.addNumericDataSource("Percentage of Entrepreneurs", new getPercEntrepreneurs());
+        data1.addNumericDataSource("Percentage of Native Entrepreneurs", new getPercNativeEntrepreneurs());
+        data1.addNumericDataSource("Percentage of Ethnic Entrepreneurs", new getPercEthnicEntrepreneurs());
+        data1.addNumericDataSource("Percentage of Native Workers", new getPercNativeWorkers());
+        data1.addNumericDataSource("Percentage of Ethnic Workers", new getPercEthnicWorkers());
+        data1.addNumericDataSource("Unemployment Rate", new getUnemploymentRate());
+        data1.addNumericDataSource("Average Entrepreneur Capital", new getAverageEntrepreneurCapital());
+
         //average wage, commenting files, record as much info as possible, averages
     }
 
@@ -814,7 +825,6 @@ public class Main extends SimModelImpl {
                 a.setCurrPayoff(computeUnemployedPayoff(a));
             }
         }
-
     }
 
     /**
@@ -1023,6 +1033,18 @@ public class Main extends SimModelImpl {
         return percentages;
     }
 
+    public double averageEntrepreneurCapital(){
+        double sum =  0;
+        int count = 0;
+        for(Agent a: agentList){
+            if(a.getcurOccupation()== 1) {
+                sum+=a.getK();
+                count++;
+            }
+        }
+        return sum/count;
+    }
+
     class getTotalS implements NumericDataSource {
         public double execute() {
             return totalS;
@@ -1048,6 +1070,48 @@ public class Main extends SimModelImpl {
                 totalWage += a.getCurrPayoff();
             }
             return totalWage / agentList.size();
+        }
+    }
+
+    class getPercEntrepreneurs implements NumericDataSource{
+        public double execute() {
+            return percentages[0];
+        }
+    }
+
+    class getPercEthnicEntrepreneurs implements NumericDataSource{
+        public double execute() {
+            return percentages[1];
+        }
+    }
+
+    class getPercNativeEntrepreneurs implements NumericDataSource{
+        public double execute() {
+            return percentages[2];
+        }
+    }
+
+    class getPercNativeWorkers implements NumericDataSource{
+        public double execute() {
+            return percentages[3];
+        }
+    }
+
+    class getPercEthnicWorkers implements NumericDataSource{
+        public double execute() {
+            return percentages[1];
+        }
+    }
+
+    class getUnemploymentRate implements NumericDataSource{
+        public double execute() {
+            return unemployment;
+        }
+    }
+
+    class getAverageEntrepreneurCapital implements NumericDataSource{
+        public double execute() {
+            return averageEntrepreneurCapital();
         }
     }
 }
