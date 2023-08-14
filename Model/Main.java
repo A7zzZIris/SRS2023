@@ -82,7 +82,7 @@ public class Main extends SimModelImpl {
     @Override
     public void setup() {
         agentList = new ArrayList<Agent>();
-        period = 1;
+        period = 10;
         gridWidth = 50;
         gridHeight = 50;
         occupancy = 0.6;
@@ -130,19 +130,9 @@ public class Main extends SimModelImpl {
             else init = false;
             updateApplications();
             hireProcess();
-            // for ( int i = 0;i<agentList.size();i++) {
-            //if (agentList.get(i).getcurOccupation()==1) {
-            //	System.out.println("id"+ i);
-            //	System.out.println("employees:"+agentList.get(i).getEmployees().size());
-            //	System.out.println("applicants:"+agentList.get(i).getApplicants().size());
-            //}
-            // }
             updateUnemployment();
             updateCapital();
             updatePrice();
-            // record every round agents' average ethnic percentage for the neighborhood
-            // percentages of entrepreneurs by race
-            // measure of segregation
             data1.record();
             data1.write();
         }
@@ -1000,6 +990,37 @@ public class Main extends SimModelImpl {
 
     public void setMinorityShare(double m) {
         minorityShare = m;
+    }
+
+    public double[] getPercentages(){
+        double[] percentages = new double[6];
+        int entrepreneur = 0;
+        int ethnicEntrepreneur = 0;
+        int nativeEntrepreneur = 0;
+        int nativeWorker = 0;
+        int ethnicWorker = 0;
+        int unemployed = 0;
+        for(Agent a: agentList){
+            int occupation = a.getcurOccupation();
+            int race = a.getRace();
+            if(occupation == 1){
+                // 1 "Entrepreneur", 2 "Native Worker", 3 "Ethnic Worker", 4 "Unemployed"
+                // 1 "Native" 2 "Ethnic"
+                entrepreneur++;
+                if(a.getRace()==1) nativeEntrepreneur++;
+                else ethnicEntrepreneur++;
+            } else if (occupation == 2) nativeWorker++;
+            else if (occupation == 3) ethnicWorker++;
+            else unemployed++;
+        }
+        percentages[0] = (double)entrepreneur/numAgents;
+        percentages[1] = (double)ethnicEntrepreneur/numAgents;
+        percentages[2] = (double)nativeEntrepreneur/numAgents;
+        percentages[3] = (double)nativeWorker/numAgents;
+        percentages[4] = (double)ethnicWorker/numAgents;
+        percentages[5] = (double)unemployed/numAgents;
+
+        return percentages;
     }
 
     class getTotalS implements NumericDataSource {
