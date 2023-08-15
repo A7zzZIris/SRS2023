@@ -54,7 +54,7 @@ public class Main extends SimModelImpl {
     private double totalS, totalD;
     private boolean init; //first period
 
-    public double[] percentages;
+    public double[] stats;
 
     private DataRecorder data1;
 
@@ -245,22 +245,25 @@ public class Main extends SimModelImpl {
 
         averp = sumP / numAgents;
 
-        percentages = getPercentages();
+        stats = getStats();
 
         data1 = new DataRecorder("/Users/m/Desktop/output.txt", this);
-        data1.addNumericDataSource("Supply", new getTotalS());
-        data1.addNumericDataSource("Demand", new getTotalD());
-        data1.addNumericDataSource("Price", new getPrice());
-        data1.addNumericDataSource("Average Payoff", new getAverageWage());
         data1.addNumericDataSource("Percentage of Entrepreneurs", new getPercEntrepreneurs());
         data1.addNumericDataSource("Percentage of Native Entrepreneurs", new getPercNativeEntrepreneurs());
         data1.addNumericDataSource("Percentage of Ethnic Entrepreneurs", new getPercEthnicEntrepreneurs());
         data1.addNumericDataSource("Percentage of Native Workers", new getPercNativeWorkers());
         data1.addNumericDataSource("Percentage of Ethnic Workers", new getPercEthnicWorkers());
         data1.addNumericDataSource("Unemployment Rate", new getUnemploymentRate());
+        data1.addNumericDataSource("Supply", new getTotalS());
+        data1.addNumericDataSource("Demand", new getTotalD());
+        data1.addNumericDataSource("Price", new getPrice());
+        data1.addNumericDataSource("Average Payoff", new getAverageWage());
+        data1.addNumericDataSource("Average Payoff NE", new getAveragePayoffNE());
+        data1.addNumericDataSource("Average Payoff EE", new getAveragePayoffEE());
+        data1.addNumericDataSource("Average Payoff NW", new getAveragePayoffNW());
+        data1.addNumericDataSource("Average Payoff EW", new getAveragePayoffEW());
+        data1.addNumericDataSource("Average Payoff U", new getAveragePayoffU());
         data1.addNumericDataSource("Average Entrepreneur Capital", new getAverageEntrepreneurCapital());
-
-        //average wage, commenting files, record as much info as possible, averages
     }
 
 
@@ -1002,14 +1005,25 @@ public class Main extends SimModelImpl {
         minorityShare = m;
     }
 
-    public double[] getPercentages(){
-        double[] percentages = new double[6];
+    public double[] getStats(){
+        double[] stats = new double[11];
         int entrepreneur = 0;
         int ethnicEntrepreneur = 0;
         int nativeEntrepreneur = 0;
         int nativeWorker = 0;
         int ethnicWorker = 0;
         int unemployed = 0;
+        double payoffEE = 0;
+        double payoffNE = 0;
+        double payoffNW = 0;
+        double payoffEW = 0;
+        double payoffU = 0;
+        double utilityNE = 0;
+        double utilityEE = 0;
+        double utilityNW = 0;
+        double utilityEW = 0;
+        double utilityU = 0;
+        //double payoffE = 0;
         for(Agent a: agentList){
             int occupation = a.getcurOccupation();
             int race = a.getRace();
@@ -1017,20 +1031,46 @@ public class Main extends SimModelImpl {
                 // 1 "Entrepreneur", 2 "Native Worker", 3 "Ethnic Worker", 4 "Unemployed"
                 // 1 "Native" 2 "Ethnic"
                 entrepreneur++;
-                if(a.getRace()==1) nativeEntrepreneur++;
-                else ethnicEntrepreneur++;
-            } else if (occupation == 2) nativeWorker++;
-            else if (occupation == 3) ethnicWorker++;
-            else unemployed++;
+                if(race==1) {
+                    nativeEntrepreneur++;
+                    payoffNE+=a.getCurrPayoff();
+                }
+                else {
+                    ethnicEntrepreneur++;
+                    payoffEE+=a.getCurrPayoff();
+                }
+            }
+            else if (occupation == 2) {
+                nativeWorker++;
+                payoffNW+=a.getCurrPayoff();
+            }
+            else if (occupation == 3) {
+                ethnicWorker++;
+                payoffEW+=a.getCurrPayoff();
+            }
+            else {
+                unemployed++;
+                payoffU+=a.getCurrPayoff();
+            }
         }
-        percentages[0] = (double)entrepreneur/numAgents;
-        percentages[1] = (double)ethnicEntrepreneur/numAgents;
-        percentages[2] = (double)nativeEntrepreneur/numAgents;
-        percentages[3] = (double)nativeWorker/numAgents;
-        percentages[4] = (double)ethnicWorker/numAgents;
-        percentages[5] = (double)unemployed/numAgents;
+        stats[0] = (double)entrepreneur/(double) numAgents;
+        stats[2] = (double)ethnicEntrepreneur/numAgents;
+        stats[1] = (double)nativeEntrepreneur/numAgents;
+        stats[3] = (double)nativeWorker/numAgents;
+        stats[4] = (double)ethnicWorker/numAgents;
+        stats[5] = (double)unemployed/numAgents;
+        stats[7] = payoffEE/ethnicEntrepreneur;
+        stats[6] = payoffNE/nativeEntrepreneur;
+        stats[8] = payoffNW/nativeWorker;
+        stats[9] = payoffEW/ethnicWorker;
+        stats[10] = payoffU/unemployed;
+        stats[7] = utilityEE/ethnicEntrepreneur;
+        stats[6] = utilityNE/nativeEntrepreneur;
+        stats[8] = utilityNW/nativeWorker;
+        stats[9] = utilityEW/ethnicWorker;
+        stats[10] = utilityU/unemployed;
 
-        return percentages;
+        return stats;
     }
 
     public double averageEntrepreneurCapital(){
@@ -1075,31 +1115,31 @@ public class Main extends SimModelImpl {
 
     class getPercEntrepreneurs implements NumericDataSource{
         public double execute() {
-            return percentages[0];
+            return stats[0];
         }
     }
 
     class getPercEthnicEntrepreneurs implements NumericDataSource{
         public double execute() {
-            return percentages[1];
+            return stats[2];
         }
     }
 
     class getPercNativeEntrepreneurs implements NumericDataSource{
         public double execute() {
-            return percentages[2];
+            return stats[1];
         }
     }
 
     class getPercNativeWorkers implements NumericDataSource{
         public double execute() {
-            return percentages[3];
+            return stats[3];
         }
     }
 
     class getPercEthnicWorkers implements NumericDataSource{
         public double execute() {
-            return percentages[1];
+            return stats[4];
         }
     }
 
@@ -1112,6 +1152,37 @@ public class Main extends SimModelImpl {
     class getAverageEntrepreneurCapital implements NumericDataSource{
         public double execute() {
             return averageEntrepreneurCapital();
+        }
+    }
+
+
+    class getAveragePayoffEE implements NumericDataSource{
+        public double execute(){
+            return stats[7];
+        }
+    }
+
+    class getAveragePayoffNE implements NumericDataSource{
+        public double execute(){
+            return stats[6];
+        }
+    }
+
+    class getAveragePayoffNW implements NumericDataSource{
+        public double execute(){
+            return stats[8];
+        }
+    }
+
+    class getAveragePayoffEW implements NumericDataSource{
+        public double execute(){
+            return stats[9];
+        }
+    }
+
+    class getAveragePayoffU implements NumericDataSource{
+        public double execute(){
+            return stats[10];
         }
     }
 }
