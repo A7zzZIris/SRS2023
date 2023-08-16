@@ -263,7 +263,13 @@ public class Main extends SimModelImpl {
         data1.addNumericDataSource("Average Payoff NW", new getAveragePayoffNW());
         data1.addNumericDataSource("Average Payoff EW", new getAveragePayoffEW());
         data1.addNumericDataSource("Average Payoff U", new getAveragePayoffU());
+        data1.addNumericDataSource("Average Utility NE", new getAverageUtilityNE());
+        data1.addNumericDataSource("Average Utility EE", new getAverageUtilityEE());
+        data1.addNumericDataSource("Average Utility NW", new getAverageUtilityNW());
+        data1.addNumericDataSource("Average Utility EW", new getAverageUtilityEW());
+        data1.addNumericDataSource("Average Utility U", new getAverageUtilityU());
         data1.addNumericDataSource("Average Entrepreneur Capital", new getAverageEntrepreneurCapital());
+
     }
 
 
@@ -327,6 +333,7 @@ public class Main extends SimModelImpl {
         //missing a condition: utility is the same
         double[] numbers = {u1, u2, u3, u4};
         double max = Arrays.stream(numbers).max().getAsDouble();
+        agent.setUtility(max);
 
         System.out.println("Payoff:");
         System.out.println("Entrepreneur:" + computeEntrepreneurPayoff(agent));
@@ -647,8 +654,6 @@ public class Main extends SimModelImpl {
      *
      * @param agent The entrepreneur who is conducting the hiring process.
      */
-
-
     public void hireWorker(Agent agent) {
         //order all the applicants from high productivity to low productivity
         ArrayList<Agent> applicants = agent.getApplicants();
@@ -1006,7 +1011,7 @@ public class Main extends SimModelImpl {
     }
 
     public double[] getStats(){
-        double[] stats = new double[11];
+        double[] stats = new double[16];
         int entrepreneur = 0;
         int ethnicEntrepreneur = 0;
         int nativeEntrepreneur = 0;
@@ -1034,23 +1039,28 @@ public class Main extends SimModelImpl {
                 if(race==1) {
                     nativeEntrepreneur++;
                     payoffNE+=a.getCurrPayoff();
+                    utilityNE+=a.getUtility();
                 }
                 else {
                     ethnicEntrepreneur++;
                     payoffEE+=a.getCurrPayoff();
+                    utilityEE+=a.getUtility();
                 }
             }
             else if (occupation == 2) {
                 nativeWorker++;
                 payoffNW+=a.getCurrPayoff();
+                utilityNW+=a.getUtility();
             }
             else if (occupation == 3) {
                 ethnicWorker++;
                 payoffEW+=a.getCurrPayoff();
+                utilityEW+=a.getUtility();
             }
             else {
                 unemployed++;
                 payoffU+=a.getCurrPayoff();
+                utilityU+=a.getUtility();
             }
         }
         stats[0] = (double)entrepreneur/(double) numAgents;
@@ -1064,11 +1074,11 @@ public class Main extends SimModelImpl {
         stats[8] = payoffNW/nativeWorker;
         stats[9] = payoffEW/ethnicWorker;
         stats[10] = payoffU/unemployed;
-        stats[7] = utilityEE/ethnicEntrepreneur;
-        stats[6] = utilityNE/nativeEntrepreneur;
-        stats[8] = utilityNW/nativeWorker;
-        stats[9] = utilityEW/ethnicWorker;
-        stats[10] = utilityU/unemployed;
+        stats[11] = utilityEE/ethnicEntrepreneur;
+        stats[12] = utilityNE/nativeEntrepreneur;
+        stats[13] = utilityNW/nativeWorker;
+        stats[14] = utilityEW/ethnicWorker;
+        stats[15] = utilityU/unemployed;
 
         return stats;
     }
@@ -1183,6 +1193,36 @@ public class Main extends SimModelImpl {
     class getAveragePayoffU implements NumericDataSource{
         public double execute(){
             return stats[10];
+        }
+    }
+
+    class getAverageUtilityEE implements NumericDataSource{
+        public double execute(){
+            return stats[11];
+        }
+    }
+
+    class getAverageUtilityNE implements NumericDataSource{
+        public double execute(){
+            return stats[12];
+        }
+    }
+
+    class getAverageUtilityNW implements NumericDataSource{
+        public double execute(){
+            return stats[13];
+        }
+    }
+
+    class getAverageUtilityEW implements NumericDataSource{
+        public double execute(){
+            return stats[14];
+        }
+    }
+
+    class getAverageUtilityU implements NumericDataSource{
+        public double execute(){
+            return stats[15];
         }
     }
 }
