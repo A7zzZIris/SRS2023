@@ -116,7 +116,6 @@ public class Main extends SimModelImpl {
         DisplayConstants.CELL_WIDTH = 50;
         DisplayConstants.CELL_HEIGHT = 50;
 
-        pE = 10;
         init = true;
     }
 
@@ -127,13 +126,13 @@ public class Main extends SimModelImpl {
 
     class eachPeriod extends BasicAction {
         public void execute() {
-            //if (!init) updateOccupationChoice();
-            //else init = false;
+            if (!init) updateOccupationChoice(); //fixed in method below
+            else init = false;
             updateApplications();
             hireProcess();
             updateUnemployment();
             //updateCapital();
-            //updatePrice();
+            updatePrice(); //price fixed in update price
             d.record();
             d.write();
         }
@@ -293,10 +292,8 @@ public class Main extends SimModelImpl {
         for (int i = 0; i < agentList.size(); i++) {
             double random = Math.random();
             Agent agent = agentList.get(i);
-            //System.out.println("id: " + i);
-            //System.out.println("Race: "+ agent.getRace());
-            //System.out.println("cur:"+agent.getcurOccupation());
-            //System.out.println("next:"+agent.getSwitchOccupation());
+
+            /*
             if (random < lambdaO) {
                 Agent boss = agent.getBoss();
                 int next = considerOccupation(agent);
@@ -313,6 +310,8 @@ public class Main extends SimModelImpl {
             } else {
                 agent.setSwitchOccupation(agent.getcurOccupation());
             }
+             */
+            agent.setSwitchOccupation(agent.getcurOccupation()); //FIX OCC CHOICE
         }
     }
 
@@ -340,6 +339,7 @@ public class Main extends SimModelImpl {
         double max = Arrays.stream(numbers).max().getAsDouble();
         //System.out.println("max" + max);
         agent.setUtility(max);
+        System.out.println("utility" + agent.getUtility());
         /*
         System.out.println("Payoff:");
         System.out.println("Entrepreneur:" + computeEntrepreneurPayoff(agent));
@@ -861,18 +861,24 @@ public class Main extends SimModelImpl {
         //System.out.println("Initial Supply: " + totalS);
         //System.out.println("Initial Demand: " + totalD);
         //System.out.println("Initial Error" + Math.abs(totalS - totalD) / totalS);
+
+        /*
         while (Math.abs(totalS - totalD) / totalS > 0.1) {
             if (totalD > totalS) pE += 100;
             else pE -= 100;
             updateDemand();
+         */
             //System.out.println("Supply: " + totalS);
             //System.out.println("Demand: " + totalD);
             //System.out.println("Error: " +Math.abs(totalS-totalD)/totalS);
             //System.out.println("Price: " + pE);
-        }
+        //}
         //System.out.println("Final Supply: " + totalS);
         //System.out.println("Final Demand: " + totalD);
         //System.out.println("Final Price: " + pE);
+
+        // ### FIXED PRICE
+        pE = 10;
     }
 
     /**
@@ -1049,6 +1055,7 @@ public class Main extends SimModelImpl {
                     }
                     else {
                         ethnicEntrepreneur++;
+                        System.out.println(a.getUtility());
                         payoffEE+=a.getCurrPayoff();
                         utilityEE+=a.getUtility();
                     }
@@ -1082,6 +1089,7 @@ public class Main extends SimModelImpl {
             stats1.put("averagePayoffEW", payoffEW/ethnicWorker);
             stats1.put("averagePayoffU", payoffU/unemployed);
             stats1.put("averageUtilityEE", utilityEE/ethnicEntrepreneur);
+            System.out.println("utilityEE: " + utilityEE);
             stats1.put("averageUtilityNE", utilityNE/nativeEntrepreneur);
             stats1.put("averageUtilityNW", utilityNW/nativeWorker);
             stats1.put("averageUtilityEW", utilityEW/ethnicWorker);
