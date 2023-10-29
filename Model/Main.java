@@ -212,18 +212,14 @@ public class Main extends SimModelImpl {
             agentList.add(ag);
             sumP += ag.getPI();
         }
-
-
         //randomly allocate the native
         for (int id = numEthnic; id < numEthnic + numNative; id++) {
             //System.out.println("id" + id);
             Agent ag = new Agent();
             ag.setID(id);
-
             ag.setRace(1); //native
             int randomX = (int) (Math.random() * gridWidth); // random X
             int randomY = (int) (Math.random() * gridHeight); // random Y
-
             while (Grid.getObjectAt(randomX, randomY) != null) {
                 randomX = (int) (Math.random() * gridWidth);
                 randomY = (int) (Math.random() * gridHeight);
@@ -231,7 +227,6 @@ public class Main extends SimModelImpl {
             Grid.putObjectAt(randomX, randomY, ag);
             //Allocate agents uniform randomly to initial occupations, all workers will unemployed and entrepreneurs will have no employees yet.
             double random = Math.random();
-
             if (random < 1.0 / 2) {
                 ag.setcurOccupation(1);
                 ag.setSwitchOccupation(1);
@@ -247,10 +242,8 @@ public class Main extends SimModelImpl {
             ag.setPI(Math.random()); //Productivity
             ag.setBI(Math.random()); //Capital
             ag.setK(ag.getBI());
-
             agentList.add(ag);
             sumP += ag.getPI();
-
         }
         System.out.println("Num Native Entrepreneur: " + numNatEnt);
         System.out.println("Num Ethnic Entrepreneur: " + numEthEnt);
@@ -262,10 +255,9 @@ public class Main extends SimModelImpl {
 
         averp = sumP / numAgents;
 
-        stats1 = getStats1();
-
-
         d = new DataRecorder("/Users/m/Desktop/output.txt", this);
+        //stats1 = getStats1();
+        d.addNumericDataSource("Stats1", new getStats1());
         d.addNumericDataSource("Percentage of Entrepreneurs", new getPercEntrepreneurs());
         d.addNumericDataSource("Percentage of Native Entrepreneurs", new getPercNativeEntrepreneurs());
         d.addNumericDataSource("Percentage of Ethnic Entrepreneurs", new getPercEthnicEntrepreneurs());
@@ -301,23 +293,19 @@ public class Main extends SimModelImpl {
         for (int i = 0; i < agentList.size(); i++) {
             double random = Math.random();
             Agent agent = agentList.get(i);
-
             //System.out.println("id: " + i);
             //System.out.println("Race: "+ agent.getRace());
             //System.out.println("cur:"+agent.getcurOccupation());
             //System.out.println("next:"+agent.getSwitchOccupation());
-
             if (random < lambdaO) {
                 Agent boss = agent.getBoss();
                 int next = considerOccupation(agent);
                 agent.setSwitchOccupation(next);
-
                 //cut the link with this agent's current boss if he want to change the job
                 if (agent.getSwitchOccupation() != agent.getcurOccupation() && boss != null) {
                     agent.setBoss(null);
                     boss.removeEmployee(agent);
                 }
-
                 //initialize Entrepreneurs' capital;
                 //if (agent.getSwitchOccupation() != agent.getcurOccupation() && agent.getSwitchOccupation() == 1) {
                 // agent.setK(agent.getBI());
@@ -381,10 +369,8 @@ public class Main extends SimModelImpl {
      * according to different races.
      * @param agent
      */
-
     public double computeEntrepreneurPayoff(Agent agent) {
         double wage;
-
         if (agent.getRace() == 1) {
             wage = (betaNE * B + (1 - betaNE) * averp);
         } else {
@@ -532,8 +518,6 @@ public class Main extends SimModelImpl {
      * The method iterates through the agent list, and if an agent plans to switch to workers,
      * it searches for potential job opportunities and sends applications to randomly chosen entrepreneurs.
      */
-
-
     public void updateApplications() {
         for (int i = 0; i < agentList.size(); i++) {
             if (agentList.get(i).getSwitchOccupation() == 2 || agentList.get(i).getSwitchOccupation() == 3) {
@@ -1029,81 +1013,82 @@ public class Main extends SimModelImpl {
         minorityShare = m;
     }
 
-    public HashMap<String, Double> getStats1(){
-        double[] stats = new double[16];
-        HashMap<String, Double> stats1 = new HashMap<String, Double>();
-        int entrepreneur = 0;
-        int ethnicEntrepreneur = 0;
-        int nativeEntrepreneur = 0;
-        int nativeWorker = 0;
-        int ethnicWorker = 0;
-        int unemployed = 0;
-        double payoffEE = 0;
-        double payoffNE = 0;
-        double payoffNW = 0;
-        double payoffEW = 0;
-        double payoffU = 0;
-        double utilityNE = 0;
-        double utilityEE = 0;
-        double utilityNW = 0;
-        double utilityEW = 0;
-        double utilityU = 0;
-        double entrepreneurCapital=0;
-        //double payoffE = 0;
-        for(Agent a: agentList){
-            int occupation = a.getcurOccupation();
-            int race = a.getRace();
-            if(occupation == 1){
-                // 1 "Entrepreneur", 2 "Native Worker", 3 "Ethnic Worker", 4 "Unemployed"
-                // 1 "Native" 2 "Ethnic"
-                entrepreneur++;
-                entrepreneurCapital+=a.getK();
-                if(race==1) {
-                    nativeEntrepreneur++;
-                    payoffNE+=a.getCurrPayoff();
-                    utilityNE+=a.getUtility();
+    class getStats1 implements NumericDataSource {
+        public double execute() {
+            stats1 = new HashMap<String, Double>();
+            int entrepreneur = 0;
+            int ethnicEntrepreneur = 0;
+            int nativeEntrepreneur = 0;
+            int nativeWorker = 0;
+            int ethnicWorker = 0;
+            int unemployed = 0;
+            double payoffEE = 0;
+            double payoffNE = 0;
+            double payoffNW = 0;
+            double payoffEW = 0;
+            double payoffU = 0;
+            double utilityNE = 0;
+            double utilityEE = 0;
+            double utilityNW = 0;
+            double utilityEW = 0;
+            double utilityU = 0;
+            double entrepreneurCapital=0;
+            //double payoffE = 0;
+            for(Agent a: agentList){
+                int occupation = a.getcurOccupation();
+                int race = a.getRace();
+                if(occupation == 1){
+                    // 1 "Entrepreneur", 2 "Native Worker", 3 "Ethnic Worker", 4 "Unemployed"
+                    // 1 "Native" 2 "Ethnic"
+                    entrepreneur++;
+                    entrepreneurCapital+=a.getK();
+                    if(race==1) {
+                        nativeEntrepreneur++;
+                        payoffNE+=a.getCurrPayoff();
+                        utilityNE+=a.getUtility();
+                    }
+                    else {
+                        ethnicEntrepreneur++;
+                        payoffEE+=a.getCurrPayoff();
+                        utilityEE+=a.getUtility();
+                    }
+                }
+                else if (occupation == 2) {
+                    nativeWorker++;
+                    payoffNW+=a.getCurrPayoff();
+                    utilityNW+=a.getUtility();
+                }
+                else if (occupation == 3) {
+                    ethnicWorker++;
+                    payoffEW+=a.getCurrPayoff();
+                    utilityEW+=a.getUtility();
                 }
                 else {
-                    ethnicEntrepreneur++;
-                    payoffEE+=a.getCurrPayoff();
-                    utilityEE+=a.getUtility();
+                    unemployed++;
+                    payoffU+=a.getCurrPayoff();
+                    utilityU+=a.getUtility();
                 }
             }
-            else if (occupation == 2) {
-                nativeWorker++;
-                payoffNW+=a.getCurrPayoff();
-                utilityNW+=a.getUtility();
-            }
-            else if (occupation == 3) {
-                ethnicWorker++;
-                payoffEW+=a.getCurrPayoff();
-                utilityEW+=a.getUtility();
-            }
-            else {
-                unemployed++;
-                payoffU+=a.getCurrPayoff();
-                utilityU+=a.getUtility();
-            }
-        }
-        stats1.put("percEntrepreneur", (double)entrepreneur/(double) numAgents);
-        stats1.put("percNativeEntrepreneur", (double)nativeEntrepreneur/numAgents);
-        stats1.put("percEthnicEntrepreneur", (double)ethnicEntrepreneur/numAgents);
-        stats1.put("percNativeWorker", (double)nativeWorker/numAgents);
-        stats1.put("percEthnicWorker", (double)ethnicWorker/numAgents);
-        stats1.put("percUnemployed", (double)unemployed/numAgents);
-        stats1.put("averageEntrepreneurCapital", entrepreneurCapital/entrepreneur);
-        stats1.put("averagePayoffEE", payoffEE/ethnicEntrepreneur);
-        stats1.put("averagePayoffNE", payoffNE/nativeEntrepreneur);
-        stats1.put("averagePayoffNW", payoffNW/nativeWorker);
-        stats1.put("averagePayoffEW", payoffEW/ethnicWorker);
-        stats1.put("averagePayoffU", payoffU/unemployed);
-        stats1.put("averageUtilityEE", utilityEE/ethnicEntrepreneur);
-        stats1.put("averageUtilityNE", utilityNE/nativeEntrepreneur);
-        stats1.put("averageUtilityNW", utilityNW/nativeWorker);
-        stats1.put("averageUtilityEW", utilityEW/ethnicWorker);
-        stats1.put("averageUtilityU", utilityU/unemployed);
+            stats1.put("percEntrepreneur", (double)entrepreneur/(double) numAgents);
+            stats1.put("percNativeEntrepreneur", (double)nativeEntrepreneur/(double)numAgents);
+            stats1.put("percEthnicEntrepreneur", (double)ethnicEntrepreneur/(double)numAgents);
+            stats1.put("percNativeWorker", (double)nativeWorker/(double)numAgents);
+            stats1.put("percEthnicWorker", (double)ethnicWorker/(double)numAgents);
+            stats1.put("percUnemployed", (double)unemployed/(double)numAgents);
+            stats1.put("averageEntrepreneurCapital", entrepreneurCapital/entrepreneur);
+            stats1.put("averagePayoffEE", payoffEE/ethnicEntrepreneur);
+            stats1.put("averagePayoffNE", payoffNE/nativeEntrepreneur);
+            stats1.put("averagePayoffNW", payoffNW/nativeWorker);
+            stats1.put("averagePayoffEW", payoffEW/ethnicWorker);
+            stats1.put("averagePayoffU", payoffU/unemployed);
+            stats1.put("averageUtilityEE", utilityEE/ethnicEntrepreneur);
+            stats1.put("averageUtilityNE", utilityNE/nativeEntrepreneur);
+            stats1.put("averageUtilityNW", utilityNW/nativeWorker);
+            stats1.put("averageUtilityEW", utilityEW/ethnicWorker);
+            stats1.put("averageUtilityU", utilityU/unemployed);
 
-        return stats1;
+            return 1;
+        }
     }
 
     class getTotalS implements NumericDataSource {
@@ -1166,9 +1151,10 @@ public class Main extends SimModelImpl {
 
     class getUnemploymentRate implements NumericDataSource{
         public double execute() {
-            updateUnemployment();
+            //updateUnemployment();
             //System.out.println("Unemployment: " + unemployment);
-            return unemployment;
+            //return unemployment;
+            return stats1.get("percUnemployed");
         }
     }
 
