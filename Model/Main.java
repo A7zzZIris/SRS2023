@@ -8,6 +8,7 @@ import java.util.Vector;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 
 import uchicago.src.sim.analysis.DataRecorder;
 import uchicago.src.sim.analysis.NumericDataSource;
@@ -55,8 +56,9 @@ public class Main extends SimModelImpl {
     private boolean init; //first period
 
     public double[] stats;
+    public HashMap<String, Double> stats1;
 
-    private DataRecorder data1;
+    private DataRecorder d;
 
     @Override
     public void begin() {
@@ -114,10 +116,8 @@ public class Main extends SimModelImpl {
         DisplayConstants.CELL_WIDTH = 50;
         DisplayConstants.CELL_HEIGHT = 50;
 
+        pE = 10;
         init = true;
-        System.out.println("Num Agents: " + numAgents);
-        System.out.println("Ethnic: " + numEthnic);
-        System.out.println("Native: " + numNative);
     }
 
     public void buildSchedule() {
@@ -127,15 +127,15 @@ public class Main extends SimModelImpl {
 
     class eachPeriod extends BasicAction {
         public void execute() {
-            if (!init) updateOccupationChoice();
-            else init = false;
+            //if (!init) updateOccupationChoice();
+            //else init = false;
             updateApplications();
             hireProcess();
             updateUnemployment();
-            updateCapital();
-            updatePrice();
-            data1.record();
-            data1.write();
+            //updateCapital();
+            //updatePrice();
+            d.record();
+            d.write();
         }
     }
 
@@ -160,11 +160,14 @@ public class Main extends SimModelImpl {
      * such as race, occupation, coordinates, entrepreneurial spirit, cost of assimilation, productivity, wealth,
      * and capital. The method also calculates the average productivity of the agents.
      */
-
     public void buildModel() {
         Grid = new Object2DGrid(gridWidth, gridHeight);
         double sumP = 0.0;
-
+        int numEnt = 0;
+        int numEthEnt = 0;
+        int numNatEnt = 0;
+        int numEthUn = 0;
+        int numNatUn = 0;
         //randomly allocate the minority
         for (int id = 0; id < numEthnic; id++) {
             Agent ag = new Agent();
@@ -190,12 +193,15 @@ public class Main extends SimModelImpl {
             if (random < 1.0 / 3) {
                 ag.setcurOccupation(1);
                 ag.setSwitchOccupation(1);
+                numEthEnt++;
             } else if (1.0 / 3 <= random && random < 2.0 / 3) {
                 ag.setcurOccupation(4);
                 ag.setSwitchOccupation(2);
+                numEthUn++;
             } else {
                 ag.setcurOccupation(4);
                 ag.setSwitchOccupation(3);
+                numEthUn++;
             }
             ag.setCoords(new int[]{randomX, randomY});
             ag.setXI(Math.random() * 10); //Entrepreneurial spirit/ability
@@ -206,6 +212,7 @@ public class Main extends SimModelImpl {
             agentList.add(ag);
             sumP += ag.getPI();
         }
+
 
         //randomly allocate the native
         for (int id = numEthnic; id < numEthnic + numNative; id++) {
@@ -228,9 +235,11 @@ public class Main extends SimModelImpl {
             if (random < 1.0 / 2) {
                 ag.setcurOccupation(1);
                 ag.setSwitchOccupation(1);
+                numNatEnt++;
             } else {
                 ag.setcurOccupation(4);
                 ag.setSwitchOccupation(2);
+                numNatUn++;
             }
             ag.setCoords(new int[]{randomX, randomY});
             ag.setXI(Math.random() * 10); //Entrepreneurial spirit/ability
@@ -241,35 +250,43 @@ public class Main extends SimModelImpl {
 
             agentList.add(ag);
             sumP += ag.getPI();
+
         }
+        System.out.println("Num Native Entrepreneur: " + numNatEnt);
+        System.out.println("Num Ethnic Entrepreneur: " + numEthEnt);
+        System.out.println("Num Native Unemployed: " + numNatUn);
+        System.out.println("Num Ethnic Unemployed: " + numEthUn);
+        System.out.println("Percentage Unemployed: " + (double)(numNatUn + numEthUn)/numAgents);
+        updateUnemployment();
+        System.out.println("Unemployment: " +unemployment);
 
         averp = sumP / numAgents;
 
-        stats = getStats();
+        stats1 = getStats1();
 
-        data1 = new DataRecorder("/Users/m/Desktop/output.txt", this);
-        data1.addNumericDataSource("Percentage of Entrepreneurs", new getPercEntrepreneurs());
-        data1.addNumericDataSource("Percentage of Native Entrepreneurs", new getPercNativeEntrepreneurs());
-        data1.addNumericDataSource("Percentage of Ethnic Entrepreneurs", new getPercEthnicEntrepreneurs());
-        data1.addNumericDataSource("Percentage of Native Workers", new getPercNativeWorkers());
-        data1.addNumericDataSource("Percentage of Ethnic Workers", new getPercEthnicWorkers());
-        data1.addNumericDataSource("Unemployment Rate", new getUnemploymentRate());
-        data1.addNumericDataSource("Supply", new getTotalS());
-        data1.addNumericDataSource("Demand", new getTotalD());
-        data1.addNumericDataSource("Price", new getPrice());
-        data1.addNumericDataSource("Average Payoff", new getAverageWage());
-        data1.addNumericDataSource("Average Payoff NE", new getAveragePayoffNE());
-        data1.addNumericDataSource("Average Payoff EE", new getAveragePayoffEE());
-        data1.addNumericDataSource("Average Payoff NW", new getAveragePayoffNW());
-        data1.addNumericDataSource("Average Payoff EW", new getAveragePayoffEW());
-        data1.addNumericDataSource("Average Payoff U", new getAveragePayoffU());
-        data1.addNumericDataSource("Average Utility NE", new getAverageUtilityNE());
-        data1.addNumericDataSource("Average Utility EE", new getAverageUtilityEE());
-        data1.addNumericDataSource("Average Utility NW", new getAverageUtilityNW());
-        data1.addNumericDataSource("Average Utility EW", new getAverageUtilityEW());
-        data1.addNumericDataSource("Average Utility U", new getAverageUtilityU());
-        data1.addNumericDataSource("Average Entrepreneur Capital", new getAverageEntrepreneurCapital());
 
+        d = new DataRecorder("/Users/m/Desktop/output.txt", this);
+        d.addNumericDataSource("Percentage of Entrepreneurs", new getPercEntrepreneurs());
+        d.addNumericDataSource("Percentage of Native Entrepreneurs", new getPercNativeEntrepreneurs());
+        d.addNumericDataSource("Percentage of Ethnic Entrepreneurs", new getPercEthnicEntrepreneurs());
+        d.addNumericDataSource("Percentage of Native Workers", new getPercNativeWorkers());
+        d.addNumericDataSource("Percentage of Ethnic Workers", new getPercEthnicWorkers());
+        d.addNumericDataSource("Unemployment Rate", new getUnemploymentRate());
+        d.addNumericDataSource("Supply", new getTotalS());
+        d.addNumericDataSource("Demand", new getTotalD());
+        d.addNumericDataSource("Price", new getPrice());
+        d.addNumericDataSource("Average Payoff", new getAverageWage());
+        d.addNumericDataSource("Average Payoff NE", new getAveragePayoffNE());
+        d.addNumericDataSource("Average Payoff EE", new getAveragePayoffEE());
+        d.addNumericDataSource("Average Payoff NW", new getAveragePayoffNW());
+        d.addNumericDataSource("Average Payoff EW", new getAveragePayoffEW());
+        d.addNumericDataSource("Average Payoff U", new getAveragePayoffU());
+        d.addNumericDataSource("Average Utility NE", new getAverageUtilityNE());
+        d.addNumericDataSource("Average Utility EE", new getAverageUtilityEE());
+        d.addNumericDataSource("Average Utility NW", new getAverageUtilityNW());
+        d.addNumericDataSource("Average Utility EW", new getAverageUtilityEW());
+        d.addNumericDataSource("Average Utility U", new getAverageUtilityU());
+        d.addNumericDataSource("Average Entrepreneur Capital", new getAverageEntrepreneurCapital());
     }
 
 
@@ -333,8 +350,9 @@ public class Main extends SimModelImpl {
         //missing a condition: utility is the same
         double[] numbers = {u1, u2, u3, u4};
         double max = Arrays.stream(numbers).max().getAsDouble();
+        //System.out.println("max" + max);
         agent.setUtility(max);
-
+        /*
         System.out.println("Payoff:");
         System.out.println("Entrepreneur:" + computeEntrepreneurPayoff(agent));
         System.out.println("WorkinNative:" + computeWorkinNativePayoff(agent));
@@ -346,7 +364,7 @@ public class Main extends SimModelImpl {
         System.out.println("WorkinEthnic:" + u3);
         System.out.println("Unemployed:" + u4);
         System.out.println();
-
+        */
         if (max == u1) {
             return 1;
         } else if (max == u2) {
@@ -663,8 +681,8 @@ public class Main extends SimModelImpl {
             ArrayList<Agent> curEmployees = agent.getEmployees();
             ArrayList<Agent> newEmployees = new ArrayList<>(curEmployees);  // a copy of curEmployees
             newEmployees.add(a);
-            System.out.println(curEmployees.size());
-            System.out.println(newEmployees.size());
+            //System.out.println(curEmployees.size());
+            //System.out.println(newEmployees.size());
             //compare the payoff
             double payoff0 = payoff(agent, curEmployees);
             double payoff1 = payoff(agent, newEmployees);
@@ -746,14 +764,15 @@ public class Main extends SimModelImpl {
      * This method calculates and updates the unemployment rate using the number of unemployed agents.
      */
     public void updateUnemployment() {
-        System.out.println(agentList.size());
+        //System.out.println(agentList.size());
         double num = 0;
         for (int i = 0; i < numAgents; i++) {
             if (agentList.get(i).getcurOccupation() == 4) {
                 num += 1;
             }
         }
-        unemployment = num / numAgents;
+        unemployment = num / agentList.size();
+        //System.out.println(num);
     }
 
 
@@ -849,15 +868,15 @@ public class Main extends SimModelImpl {
                 ArrayList<Agent> employees = a.getEmployees();
                 for (Agent employee : employees) sumPK += employee.getPI();
                 totalS += Math.pow(agentKI, alpha) * Math.pow(sumPK, 1 - alpha);
-                System.out.println("AgentKI: " + agentKI);
-                System.out.println("Alpha: " + alpha);
-                System.out.println("Aggregate Supply: " + totalS);
+                //System.out.println("AgentKI: " + agentKI);
+                //System.out.println("Alpha: " + alpha);
+                //System.out.println("Aggregate Supply: " + totalS);
             }
         }
         updateDemand();
-        System.out.println("Initial Supply: " + totalS);
-        System.out.println("Initial Demand: " + totalD);
-        System.out.println("Initial Error" + Math.abs(totalS - totalD) / totalS);
+        //System.out.println("Initial Supply: " + totalS);
+        //System.out.println("Initial Demand: " + totalD);
+        //System.out.println("Initial Error" + Math.abs(totalS - totalD) / totalS);
         while (Math.abs(totalS - totalD) / totalS > 0.1) {
             if (totalD > totalS) pE += 100;
             else pE -= 100;
@@ -867,9 +886,9 @@ public class Main extends SimModelImpl {
             //System.out.println("Error: " +Math.abs(totalS-totalD)/totalS);
             //System.out.println("Price: " + pE);
         }
-        System.out.println("Final Supply: " + totalS);
-        System.out.println("Final Demand: " + totalD);
-        System.out.println("Final Price: " + pE);
+        //System.out.println("Final Supply: " + totalS);
+        //System.out.println("Final Demand: " + totalD);
+        //System.out.println("Final Price: " + pE);
     }
 
     /**
@@ -1010,8 +1029,9 @@ public class Main extends SimModelImpl {
         minorityShare = m;
     }
 
-    public double[] getStats(){
+    public HashMap<String, Double> getStats1(){
         double[] stats = new double[16];
+        HashMap<String, Double> stats1 = new HashMap<String, Double>();
         int entrepreneur = 0;
         int ethnicEntrepreneur = 0;
         int nativeEntrepreneur = 0;
@@ -1028,6 +1048,7 @@ public class Main extends SimModelImpl {
         double utilityNW = 0;
         double utilityEW = 0;
         double utilityU = 0;
+        double entrepreneurCapital=0;
         //double payoffE = 0;
         for(Agent a: agentList){
             int occupation = a.getcurOccupation();
@@ -1036,6 +1057,7 @@ public class Main extends SimModelImpl {
                 // 1 "Entrepreneur", 2 "Native Worker", 3 "Ethnic Worker", 4 "Unemployed"
                 // 1 "Native" 2 "Ethnic"
                 entrepreneur++;
+                entrepreneurCapital+=a.getK();
                 if(race==1) {
                     nativeEntrepreneur++;
                     payoffNE+=a.getCurrPayoff();
@@ -1063,36 +1085,25 @@ public class Main extends SimModelImpl {
                 utilityU+=a.getUtility();
             }
         }
-        stats[0] = (double)entrepreneur/(double) numAgents;
-        stats[2] = (double)ethnicEntrepreneur/numAgents;
-        stats[1] = (double)nativeEntrepreneur/numAgents;
-        stats[3] = (double)nativeWorker/numAgents;
-        stats[4] = (double)ethnicWorker/numAgents;
-        stats[5] = (double)unemployed/numAgents;
-        stats[7] = payoffEE/ethnicEntrepreneur;
-        stats[6] = payoffNE/nativeEntrepreneur;
-        stats[8] = payoffNW/nativeWorker;
-        stats[9] = payoffEW/ethnicWorker;
-        stats[10] = payoffU/unemployed;
-        stats[11] = utilityEE/ethnicEntrepreneur;
-        stats[12] = utilityNE/nativeEntrepreneur;
-        stats[13] = utilityNW/nativeWorker;
-        stats[14] = utilityEW/ethnicWorker;
-        stats[15] = utilityU/unemployed;
+        stats1.put("percEntrepreneur", (double)entrepreneur/(double) numAgents);
+        stats1.put("percNativeEntrepreneur", (double)nativeEntrepreneur/numAgents);
+        stats1.put("percEthnicEntrepreneur", (double)ethnicEntrepreneur/numAgents);
+        stats1.put("percNativeWorker", (double)nativeWorker/numAgents);
+        stats1.put("percEthnicWorker", (double)ethnicWorker/numAgents);
+        stats1.put("percUnemployed", (double)unemployed/numAgents);
+        stats1.put("averageEntrepreneurCapital", entrepreneurCapital/entrepreneur);
+        stats1.put("averagePayoffEE", payoffEE/ethnicEntrepreneur);
+        stats1.put("averagePayoffNE", payoffNE/nativeEntrepreneur);
+        stats1.put("averagePayoffNW", payoffNW/nativeWorker);
+        stats1.put("averagePayoffEW", payoffEW/ethnicWorker);
+        stats1.put("averagePayoffU", payoffU/unemployed);
+        stats1.put("averageUtilityEE", utilityEE/ethnicEntrepreneur);
+        stats1.put("averageUtilityNE", utilityNE/nativeEntrepreneur);
+        stats1.put("averageUtilityNW", utilityNW/nativeWorker);
+        stats1.put("averageUtilityEW", utilityEW/ethnicWorker);
+        stats1.put("averageUtilityU", utilityU/unemployed);
 
-        return stats;
-    }
-
-    public double averageEntrepreneurCapital(){
-        double sum =  0;
-        int count = 0;
-        for(Agent a: agentList){
-            if(a.getcurOccupation()== 1) {
-                sum+=a.getK();
-                count++;
-            }
-        }
-        return sum/count;
+        return stats1;
     }
 
     class getTotalS implements NumericDataSource {
@@ -1125,104 +1136,106 @@ public class Main extends SimModelImpl {
 
     class getPercEntrepreneurs implements NumericDataSource{
         public double execute() {
-            return stats[0];
+            return stats1.get("percEntrepreneur");
         }
     }
 
     class getPercEthnicEntrepreneurs implements NumericDataSource{
         public double execute() {
-            return stats[2];
+            return stats1.get("percEthnicEntrepreneur");
         }
     }
 
     class getPercNativeEntrepreneurs implements NumericDataSource{
         public double execute() {
-            return stats[1];
+            return stats1.get("percNativeEntrepreneur");
         }
     }
 
     class getPercNativeWorkers implements NumericDataSource{
         public double execute() {
-            return stats[3];
+            return stats1.get("percNativeWorker");
         }
     }
 
     class getPercEthnicWorkers implements NumericDataSource{
         public double execute() {
-            return stats[4];
+            return stats1.get("percEthnicWorker");
         }
     }
 
     class getUnemploymentRate implements NumericDataSource{
         public double execute() {
+            updateUnemployment();
+            //System.out.println("Unemployment: " + unemployment);
             return unemployment;
         }
     }
 
     class getAverageEntrepreneurCapital implements NumericDataSource{
         public double execute() {
-            return averageEntrepreneurCapital();
+            return stats1.get("averageEntrepreneurCapital");
         }
     }
 
 
     class getAveragePayoffEE implements NumericDataSource{
         public double execute(){
-            return stats[7];
+            return stats1.get("averagePayoffEE");
         }
     }
 
     class getAveragePayoffNE implements NumericDataSource{
         public double execute(){
-            return stats[6];
+            return stats1.get("averagePayoffNE");
         }
     }
 
     class getAveragePayoffNW implements NumericDataSource{
         public double execute(){
-            return stats[8];
+            return stats1.get("averagePayoffNW");
         }
     }
 
     class getAveragePayoffEW implements NumericDataSource{
         public double execute(){
-            return stats[9];
+            return stats1.get("averagePayoffEW");
         }
     }
 
     class getAveragePayoffU implements NumericDataSource{
         public double execute(){
-            return stats[10];
+            return stats1.get("averagePayoffU");
         }
     }
 
     class getAverageUtilityEE implements NumericDataSource{
         public double execute(){
-            return stats[11];
+            return stats1.get("averageUtilityEE");
         }
     }
 
     class getAverageUtilityNE implements NumericDataSource{
         public double execute(){
-            return stats[12];
+            return stats1.get("averageUtilityNE");
         }
     }
 
     class getAverageUtilityNW implements NumericDataSource{
         public double execute(){
-            return stats[13];
+            return stats1.get("averageUtilityNW");
         }
     }
 
     class getAverageUtilityEW implements NumericDataSource{
         public double execute(){
-            return stats[14];
+            return stats1.get("averageUtilityEW");
         }
     }
 
     class getAverageUtilityU implements NumericDataSource{
         public double execute(){
-            return stats[15];
+            return stats1.get("averageUtilityU");
         }
     }
 }
