@@ -85,7 +85,7 @@ public class Main extends SimModelImpl {
     @Override
     public void setup() {
         agentList = new ArrayList<Agent>();
-        period = 10;
+        period = 50;
         gridWidth = 50;
         gridHeight = 50;
         occupancy = 0.6;
