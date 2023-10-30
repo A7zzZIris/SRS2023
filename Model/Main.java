@@ -293,11 +293,10 @@ public class Main extends SimModelImpl {
             double random = Math.random();
             Agent agent = agentList.get(i);
 
-            /*
             if (random < lambdaO) {
                 Agent boss = agent.getBoss();
                 int next = considerOccupation(agent);
-                agent.setSwitchOccupation(next);
+                //agent.setSwitchOccupation(next); FIX UNCOMMENT WHEN FINISHED
                 //cut the link with this agent's current boss if he want to change the job
                 if (agent.getSwitchOccupation() != agent.getcurOccupation() && boss != null) {
                     agent.setBoss(null);
@@ -310,8 +309,6 @@ public class Main extends SimModelImpl {
             } else {
                 agent.setSwitchOccupation(agent.getcurOccupation());
             }
-             */
-            agent.setSwitchOccupation(agent.getcurOccupation()); //FIX OCC CHOICE
         }
     }
 
@@ -336,10 +333,18 @@ public class Main extends SimModelImpl {
         double u4 = computeUnemployedUtility(computeUnemployedPayoff(agent), pE, agent);
         //missing a condition: utility is the same
         double[] numbers = {u1, u2, u3, u4};
+
+        System.out.println("race " + agent.getRace());
+        System.out.println("occupation"+agent.getcurOccupation());
+        for(int i = 0; i<numbers.length; i++){
+            System.out.print(numbers[i]+ " ");
+        }
+        System.out.println();
         double max = Arrays.stream(numbers).max().getAsDouble();
         //System.out.println("max" + max);
         agent.setUtility(max);
-        System.out.println("utility" + agent.getUtility());
+        //System.out.println("race " + agent.getRace());
+        //System.out.println("utility " + agent.getUtility());
         /*
         System.out.println("Payoff:");
         System.out.println("Entrepreneur:" + computeEntrepreneurPayoff(agent));
@@ -378,7 +383,6 @@ public class Main extends SimModelImpl {
         }
 
         double x = agent.getXI();
-
         double numeratorN = x * Math.pow(averp, beta) * Math.pow(beta, 1 - alpha) * Math.pow(alpha, alpha);
         double denominatorN = Math.pow(wage, 1 - alpha) * Math.pow(r, alpha);
         double exponentN = 1 / (1 - alpha - beta);
@@ -387,8 +391,9 @@ public class Main extends SimModelImpl {
         double denominatorK = Math.pow(wage, beta) * Math.pow(r, 1 - beta);
         double exponentK = 1 / (1 - alpha - beta);
 
-        double n = Math.pow(numeratorN / denominatorN, exponentN);
-        double k = Math.pow(numeratorK / denominatorK, exponentK);
+        double n;
+        double k;
+
 
         if (agent.getRace() == 1) {
             n = Math.pow(numeratorN / denominatorN, exponentN);
@@ -398,7 +403,9 @@ public class Main extends SimModelImpl {
             n = Math.pow((pE * numeratorN) / denominatorN, exponentN);
             k = Math.pow((pE * numeratorK) / denominatorK, exponentK);
         }
-        double payoff = x * Math.pow(averp, beta) * Math.pow(k, alpha) * Math.pow(n, beta) - n * wage - r * k;
+        //System.out.println("race" + agent.getRace());
+
+        double payoff = x * Math.pow(averp* agent.getEmployees().size(), beta) * Math.pow(k, alpha) * Math.pow(n, beta) - agent.getEmployees().size() * wage - r * k;
 
         return payoff;
     }
@@ -422,6 +429,7 @@ public class Main extends SimModelImpl {
 
     public double computeEntrepreneurUtility(double budget, double pE, Agent agent) {
         //two conditions: native individuals and ethnic individuals
+        if(budget <= 0) return 0;
         double u;
         if (agent.getRace() == 1) {
             double cNE;
@@ -432,11 +440,16 @@ public class Main extends SimModelImpl {
             u = Math.pow(cNE, gammaN) * Math.pow(cNG, 1 - gammaN);
 
         } else {
+
             double cEE;
             double cEG;
 
             cEE = (budget * gammaE) / pE;
             cEG = (1 - gammaE) * budget;
+            //System.out.println("budget" + budget);
+            //System.out.println("cEE" + cEE);
+            //System.out.println("cEG" + cEG);
+            //System.out.println("gammaE" + gammaE);
             u = Math.pow(cEE, gammaE) * Math.pow(cEG, 1 - gammaE);
         }
         return u;
@@ -1043,6 +1056,7 @@ public class Main extends SimModelImpl {
             for(Agent a: agentList){
                 int occupation = a.getcurOccupation();
                 int race = a.getRace();
+                updatePayoff(a);
                 if(occupation == 1){
                     // 1 "Entrepreneur", 2 "Native Worker", 3 "Ethnic Worker", 4 "Unemployed"
                     // 1 "Native" 2 "Ethnic"
@@ -1052,10 +1066,11 @@ public class Main extends SimModelImpl {
                         nativeEntrepreneur++;
                         payoffNE+=a.getCurrPayoff();
                         utilityNE+=a.getUtility();
+                        //System.out.println("ne util" + a.getUtility());
                     }
                     else {
                         ethnicEntrepreneur++;
-                        System.out.println(a.getUtility());
+                        //System.out.println("ee util" + a.getUtility());
                         payoffEE+=a.getCurrPayoff();
                         utilityEE+=a.getUtility();
                     }
@@ -1064,16 +1079,19 @@ public class Main extends SimModelImpl {
                     nativeWorker++;
                     payoffNW+=a.getCurrPayoff();
                     utilityNW+=a.getUtility();
+                    //System.out.println("nw util" + a.getUtility());
                 }
                 else if (occupation == 3) {
                     ethnicWorker++;
                     payoffEW+=a.getCurrPayoff();
                     utilityEW+=a.getUtility();
+                    //System.out.println("ew util" + a.getUtility());
                 }
                 else {
                     unemployed++;
                     payoffU+=a.getCurrPayoff();
                     utilityU+=a.getUtility();
+                    //System.out.println("u util" + a.getUtility());
                 }
             }
             stats1.put("percEntrepreneur", (double)entrepreneur/(double) numAgents);
