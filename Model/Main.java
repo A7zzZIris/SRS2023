@@ -126,8 +126,12 @@ public class Main extends SimModelImpl {
 
     class eachPeriod extends BasicAction {
         public void execute() {
-            if (!init) updateOccupationChoice(); //fixed in method below
-            else init = false;
+
+            for(Agent a: agentList){
+                int i = considerOccupation(a);
+            }
+            //if (!init) updateOccupationChoice(); //fixed in method below
+            //else init = false;
             updateApplications();
             hireProcess();
             updateUnemployment();
@@ -203,7 +207,7 @@ public class Main extends SimModelImpl {
                 numEthUn++;
             }
             ag.setCoords(new int[]{randomX, randomY});
-            ag.setXI(Math.random() * 10); //Entrepreneurial spirit/ability
+            ag.setXI(Math.random() * 50); //Entrepreneurial spirit/ability
             ag.setCI(Math.random()); //Cost of Assimilation
             ag.setPI(Math.random()); //Productivity
             ag.setBI(Math.random()); //Wealth to begin business
@@ -236,7 +240,7 @@ public class Main extends SimModelImpl {
                 numNatUn++;
             }
             ag.setCoords(new int[]{randomX, randomY});
-            ag.setXI(Math.random() * 10); //Entrepreneurial spirit/ability
+            ag.setXI(Math.random() * 100); //Entrepreneurial spirit/ability
             ag.setCI(Math.random()); //Cost of Assimilation
             ag.setPI(Math.random()); //Productivity
             ag.setBI(Math.random()); //Capital
@@ -261,6 +265,8 @@ public class Main extends SimModelImpl {
         d.addNumericDataSource("Percentage of Native Entrepreneurs", new getPercNativeEntrepreneurs());
         d.addNumericDataSource("Percentage of Ethnic Entrepreneurs", new getPercEthnicEntrepreneurs());
         d.addNumericDataSource("Percentage of Native Workers", new getPercNativeWorkers());
+        d.addNumericDataSource("Percentage of Native Workers NF", new getPercNativeWorkerNF());
+        d.addNumericDataSource("Percentage of Ethic Workers NF", new getPercEthnicWorkerNF());
         d.addNumericDataSource("Percentage of Ethnic Workers", new getPercEthnicWorkers());
         d.addNumericDataSource("Unemployment Rate", new getUnemploymentRate());
         d.addNumericDataSource("Supply", new getTotalS());
@@ -270,6 +276,8 @@ public class Main extends SimModelImpl {
         d.addNumericDataSource("Average Payoff NE", new getAveragePayoffNE());
         d.addNumericDataSource("Average Payoff EE", new getAveragePayoffEE());
         d.addNumericDataSource("Average Payoff NW", new getAveragePayoffNW());
+        d.addNumericDataSource("Average Payoff NWNF", new getAveragePayoffNWNF());
+        d.addNumericDataSource("Average Payoff EWNF", new getAveragePayoffEWNF());
         d.addNumericDataSource("Average Payoff EW", new getAveragePayoffEW());
         d.addNumericDataSource("Average Payoff U", new getAveragePayoffU());
         d.addNumericDataSource("Average Utility NE", new getAverageUtilityNE());
@@ -289,14 +297,14 @@ public class Main extends SimModelImpl {
      * and utility considerations.
      */
     public void updateOccupationChoice() {
-        for (int i = 0; i < agentList.size(); i++) {
+        for (int i = 0; i < agentList.size(); i++) { //iterate through all agents
             double random = Math.random();
             Agent agent = agentList.get(i);
 
-            if (random < lambdaO) {
+            if (random < lambdaO) { //if random less than lambda0 -> change switch occupation to optimal, otherwise don't switch
                 Agent boss = agent.getBoss();
                 int next = considerOccupation(agent);
-                //agent.setSwitchOccupation(next); FIX UNCOMMENT WHEN FINISHED
+                agent.setSwitchOccupation(next); //FIX UNCOMMENT WHEN FINISHED
                 //cut the link with this agent's current boss if he want to change the job
                 if (agent.getSwitchOccupation() != agent.getcurOccupation() && boss != null) {
                     agent.setBoss(null);
@@ -304,9 +312,9 @@ public class Main extends SimModelImpl {
                 }
                 //initialize Entrepreneurs' capital;
                 //if (agent.getSwitchOccupation() != agent.getcurOccupation() && agent.getSwitchOccupation() == 1) {
-                // agent.setK(agent.getBI());
-                //}
-            } else {
+                 //agent.setK(agent.getBI());
+                }
+            else {
                 agent.setSwitchOccupation(agent.getcurOccupation());
             }
         }
@@ -533,6 +541,7 @@ public class Main extends SimModelImpl {
      */
     public void updateApplications() {
         for (int i = 0; i < agentList.size(); i++) {
+            if (agentList.get(i).getSwitchOccupation() == agentList.get(i).getcurOccupation()) continue;
             if (agentList.get(i).getSwitchOccupation() == 2 || agentList.get(i).getSwitchOccupation() == 3) {
                 Agent agent = agentList.get(i);
                 //  System.out.println("id:"+ i);
@@ -1039,11 +1048,15 @@ public class Main extends SimModelImpl {
             int ethnicEntrepreneur = 0;
             int nativeEntrepreneur = 0;
             int nativeWorker = 0;
+            int nativeWorkerNF = 0;
+            int ethnicWorkerNF = 0;
             int ethnicWorker = 0;
             int unemployed = 0;
             double payoffEE = 0;
             double payoffNE = 0;
             double payoffNW = 0;
+            double payoffNWNF = 0;
+            double payoffEWNF = 0;
             double payoffEW = 0;
             double payoffU = 0;
             double utilityNE = 0;
@@ -1072,10 +1085,18 @@ public class Main extends SimModelImpl {
                         ethnicEntrepreneur++;
                         //System.out.println("ee util" + a.getUtility());
                         payoffEE+=a.getCurrPayoff();
-                        utilityEE+=a.getUtility();
+                        utilityEE+=computeEntrepreneurUtility(a.getCurrPayoff(), pE, a);
                     }
                 }
                 else if (occupation == 2) {
+                    if(race==1){
+                        nativeWorkerNF++;
+                        payoffNWNF+=a.getCurrPayoff();
+                    }
+                    else{
+                        ethnicWorkerNF++;
+                        payoffEWNF+=a.getCurrPayoff();
+                    }
                     nativeWorker++;
                     payoffNW+=a.getCurrPayoff();
                     utilityNW+=a.getUtility();
@@ -1104,6 +1125,8 @@ public class Main extends SimModelImpl {
             stats1.put("averagePayoffEE", payoffEE/ethnicEntrepreneur);
             stats1.put("averagePayoffNE", payoffNE/nativeEntrepreneur);
             stats1.put("averagePayoffNW", payoffNW/nativeWorker);
+            stats1.put("averagePayoffNWNF", payoffNWNF/nativeWorkerNF);
+            stats1.put("averagePayoffEWNF", payoffEWNF/ethnicWorkerNF);
             stats1.put("averagePayoffEW", payoffEW/ethnicWorker);
             stats1.put("averagePayoffU", payoffU/unemployed);
             stats1.put("averageUtilityEE", utilityEE/ethnicEntrepreneur);
@@ -1112,8 +1135,33 @@ public class Main extends SimModelImpl {
             stats1.put("averageUtilityNW", utilityNW/nativeWorker);
             stats1.put("averageUtilityEW", utilityEW/ethnicWorker);
             stats1.put("averageUtilityU", utilityU/unemployed);
-
+            stats1.put("percNativeWorkerNF", (double)nativeWorkerNF/(double)numAgents);
+            stats1.put("percEthnicWorkerNF", (double)ethnicWorkerNF/(double)numAgents);
             return 1;
+        }
+    }
+
+    class getAveragePayoffNWNF implements NumericDataSource {
+        public double execute() {
+            return stats1.get("averagePayoffNWNF");
+        }
+    }
+
+    class getAveragePayoffEWNF implements NumericDataSource {
+        public double execute() {
+            return stats1.get("averagePayoffEWNF");
+        }
+    }
+
+    class getPercEthnicWorkerNF implements NumericDataSource {
+        public double execute() {
+            return stats1.get("percEthnicWorkerNF");
+        }
+    }
+
+    class getPercNativeWorkerNF implements NumericDataSource {
+        public double execute() {
+            return stats1.get("percNativeWorkerNF");
         }
     }
 
