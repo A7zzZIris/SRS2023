@@ -93,9 +93,9 @@ public class Main extends SimModelImpl {
         minorityShare = 0.3;
         r = 0.1;
         B = 2;
-        pE = 0.8;
+        pE = 10;
         alpha = 0.2;
-        beta = 0.7;
+        beta = 0.2;
         betaN = 0.5;
         betaNE = 0.4;
         betaEE = 0.3;
@@ -248,13 +248,7 @@ public class Main extends SimModelImpl {
             agentList.add(ag);
             sumP += ag.getPI();
         }
-        System.out.println("Num Native Entrepreneur: " + numNatEnt);
-        System.out.println("Num Ethnic Entrepreneur: " + numEthEnt);
-        System.out.println("Num Native Unemployed: " + numNatUn);
-        System.out.println("Num Ethnic Unemployed: " + numEthUn);
-        System.out.println("Percentage Unemployed: " + (double)(numNatUn + numEthUn)/numAgents);
         updateUnemployment();
-        System.out.println("Unemployment: " +unemployment);
 
         averp = sumP / numAgents;
 
@@ -342,8 +336,8 @@ public class Main extends SimModelImpl {
         //missing a condition: utility is the same
         double[] numbers = {u1, u2, u3, u4};
 
-        System.out.println("race " + agent.getRace());
-        System.out.println("occupation"+agent.getcurOccupation());
+        //System.out.println("race " + agent.getRace());
+        //System.out.println("occupation"+agent.getcurOccupation());
         for(int i = 0; i<numbers.length; i++){
             System.out.print(numbers[i]+ " ");
         }
@@ -406,14 +400,26 @@ public class Main extends SimModelImpl {
         if (agent.getRace() == 1) {
             n = Math.pow(numeratorN / denominatorN, exponentN);
             k = Math.pow(numeratorK / denominatorK, exponentK);
+            //System.out.println("native n:" +n + " k: " +k);
+            //System.out.println("exponentn" +exponentN);
+            //System.out.println("native n w/o exponent" + numeratorN / denominatorN);
+            //System.out.println("exponentk" +exponentK);
+            //System.out.println("native k w/o exponent" + numeratorK / denominatorK);
+
 
         } else {
             n = Math.pow((pE * numeratorN) / denominatorN, exponentN);
             k = Math.pow((pE * numeratorK) / denominatorK, exponentK);
+            System.out.println("ethnic n:" +n + " k: " +k);
+            System.out.println("averp" + averp);
+            System.out.println("num employee" + agent.getEmployees().size());
+            System.out.println("test"+ pE * x * Math.pow(averp* agent.getEmployees().size(), beta) * Math.pow(k, alpha) * Math.pow(n, beta));
         }
         //System.out.println("race" + agent.getRace());
 
-        double payoff = x * Math.pow(averp* agent.getEmployees().size(), beta) * Math.pow(k, alpha) * Math.pow(n, beta) - agent.getEmployees().size() * wage - r * k;
+
+
+        double payoff = pE * x * Math.pow(averp* agent.getEmployees().size(), beta) * Math.pow(k, alpha) * Math.pow(n, beta) - agent.getEmployees().size() * wage - r * k;
 
         return payoff;
     }
@@ -448,10 +454,8 @@ public class Main extends SimModelImpl {
             u = Math.pow(cNE, gammaN) * Math.pow(cNG, 1 - gammaN);
 
         } else {
-
             double cEE;
             double cEG;
-
             cEE = (budget * gammaE) / pE;
             cEG = (1 - gammaE) * budget;
             //System.out.println("budget" + budget);
@@ -1078,7 +1082,8 @@ public class Main extends SimModelImpl {
                     if(race==1) {
                         nativeEntrepreneur++;
                         payoffNE+=a.getCurrPayoff();
-                        utilityNE+=a.getUtility();
+                        //utilityNE+=a.getUtility();
+                        utilityNE+=computeEntrepreneurUtility(a.getCurrPayoff(), pE, a);
                         //System.out.println("ne util" + a.getUtility());
                     }
                     else {
@@ -1130,7 +1135,6 @@ public class Main extends SimModelImpl {
             stats1.put("averagePayoffEW", payoffEW/ethnicWorker);
             stats1.put("averagePayoffU", payoffU/unemployed);
             stats1.put("averageUtilityEE", utilityEE/ethnicEntrepreneur);
-            System.out.println("utilityEE: " + utilityEE);
             stats1.put("averageUtilityNE", utilityNE/nativeEntrepreneur);
             stats1.put("averageUtilityNW", utilityNW/nativeWorker);
             stats1.put("averageUtilityEW", utilityEW/ethnicWorker);
