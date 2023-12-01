@@ -92,7 +92,7 @@ public class Main extends SimModelImpl {
         occupancy = 0.6;
 
         minorityShare = 0.3;
-        r = 0.1;
+        r = 0.01;
         B = 2;
         pE = 10;
         alpha = 0.2;
@@ -254,7 +254,6 @@ public class Main extends SimModelImpl {
         averp = sumP / numAgents;
 
         d = new DataRecorder("/Users/m/Desktop/output.txt", this);
-        //stats1 = getStats1();
         d.addNumericDataSource("Stats1", new getStats1());
         d.addNumericDataSource("Percentage of Entrepreneurs", new getPercEntrepreneurs());
         d.addNumericDataSource("Percentage of Native Entrepreneurs", new getPercNativeEntrepreneurs());
@@ -262,8 +261,8 @@ public class Main extends SimModelImpl {
         d.addNumericDataSource("Percentage of Native Workers NF", new getPercNativeWorkerNF());
         d.addNumericDataSource("Percentage of Ethic Workers NF", new getPercEthnicWorkerNF());
         d.addNumericDataSource("Percentage of Ethnic Workers", new getPercEthnicWorkers());
-        d.addNumericDataSource("Eth Unemployment", new getEthUnemploymentRate());
         d.addNumericDataSource("Nat Unemployment", new getNatUnemploymentRate());
+        d.addNumericDataSource("Eth Unemployment", new getEthUnemploymentRate());
         d.addNumericDataSource("Unemployment Rate", new getUnemploymentRate());
         d.addNumericDataSource("Supply", new getTotalS());
         d.addNumericDataSource("Demand", new getTotalD());
@@ -276,8 +275,8 @@ public class Main extends SimModelImpl {
         d.addNumericDataSource("Average Payoff EWNF", new getAveragePayoffEWNF());
         d.addNumericDataSource("Average Payoff EW", new getAveragePayoffEW());
         d.addNumericDataSource("Average Payoff U", new getAveragePayoffU());
-        d.addNumericDataSource("Average Payoff EU", new getAveragePayoffEU());
         d.addNumericDataSource("Average Payoff NU", new getAveragePayoffNU());
+        d.addNumericDataSource("Average Payoff EU", new getAveragePayoffEU());
         d.addNumericDataSource("Average Utility NE", new getAverageUtilityNE());
         d.addNumericDataSource("Average Utility EE", new getAverageUtilityEE());
         d.addNumericDataSource("Average Utility NW", new getAverageUtilityNW());
@@ -342,28 +341,17 @@ public class Main extends SimModelImpl {
 
         //System.out.println("race " + agent.getRace());
         //System.out.println("occupation"+agent.getcurOccupation());
-        for(int i = 0; i<numbers.length; i++){
-            System.out.print(numbers[i]+ " ");
+        if(agent.getcurOccupation()==4 && agent.getRace() == 1) {
+            for (int i = 0; i < numbers.length; i++) {
+                System.out.print(numbers[i] + " ");
+            }
+            System.out.println();
         }
-        System.out.println();
         double max = Arrays.stream(numbers).max().getAsDouble();
         //System.out.println("max" + max);
         agent.setUtility(max);
-        //System.out.println("race " + agent.getRace());
-        //System.out.println("utility " + agent.getUtility());
-        /*
-        System.out.println("Payoff:");
-        System.out.println("Entrepreneur:" + computeEntrepreneurPayoff(agent));
-        System.out.println("WorkinNative:" + computeWorkinNativePayoff(agent));
-        System.out.println("WorkinEthnic:" + computeWorkinEthnicPayoff(agent));
-        System.out.println("Unemployed:" + computeUnemployedPayoff(agent));
-        System.out.println("Utility:");
-        System.out.println("Entrepreneur:" + u1);
-        System.out.println("WorkinNative:" + u2);
-        System.out.println("WorkinEthnic:" + u3);
-        System.out.println("Unemployed:" + u4);
-        System.out.println();
-        */
+
+
         if (max == u1) {
             return 1;
         } else if (max == u2) {
@@ -414,10 +402,6 @@ public class Main extends SimModelImpl {
         } else {
             n = Math.pow((pE * numeratorN) / denominatorN, exponentN);
             k = Math.pow((pE * numeratorK) / denominatorK, exponentK);
-            System.out.println("ethnic n:" +n + " k: " +k);
-            System.out.println("averp" + averp);
-            System.out.println("num employee" + agent.getEmployees().size());
-            System.out.println("test"+ pE * x * Math.pow(averp* agent.getEmployees().size(), beta) * Math.pow(k, alpha) * Math.pow(n, beta));
         }
         //System.out.println("race" + agent.getRace());
 
@@ -881,7 +865,7 @@ public class Main extends SimModelImpl {
                 double sumPK = 0;
                 ArrayList<Agent> employees = a.getEmployees();
                 for (Agent employee : employees) sumPK += employee.getPI();
-                totalS += Math.pow(agentKI, alpha) * Math.pow(sumPK, 1 - alpha);
+                totalS += Math.pow(agentKI, alpha) * Math.pow(sumPK, beta);// profit function, check with prof
                 //System.out.println("AgentKI: " + agentKI);
                 //System.out.println("Alpha: " + alpha);
                 //System.out.println("Aggregate Supply: " + totalS);
@@ -908,7 +892,7 @@ public class Main extends SimModelImpl {
         //System.out.println("Final Price: " + pE);
 
         // ### FIXED PRICE
-        pE = 0.8;
+        //pE = 0.8;
     }
 
     /**
