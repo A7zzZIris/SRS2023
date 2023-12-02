@@ -105,7 +105,7 @@ public class Main extends SimModelImpl {
         gammaE = 0.7;
         gammaEA = 0.5;
         theta = 5;
-
+        // calculation of agents
         numAgents = (int) (gridWidth * gridHeight * occupancy);
         numEthnic = (int) (numAgents * minorityShare);
         numNative = numAgents - numEthnic;
@@ -116,7 +116,6 @@ public class Main extends SimModelImpl {
         registerDisplaySurface("test", dsurf);
         DisplayConstants.CELL_WIDTH = 50;
         DisplayConstants.CELL_HEIGHT = 50;
-
         init = true;
     }
 
@@ -127,10 +126,10 @@ public class Main extends SimModelImpl {
 
     class eachPeriod extends BasicAction {
         public void execute() {
-
             for(Agent a: agentList){
                 int i = considerOccupation(a);
             }
+            //don't update occupational choice in first step
             if (!init) updateOccupationChoice(); //fixed in method below
             else init = false;
             updateApplications();
@@ -339,8 +338,6 @@ public class Main extends SimModelImpl {
         //missing a condition: utility is the same
         double[] numbers = {u1, u2, u3, u4};
 
-        //System.out.println("race " + agent.getRace());
-        //System.out.println("occupation"+agent.getcurOccupation());
         if(agent.getcurOccupation()==4 && agent.getRace() == 1) {
             for (int i = 0; i < numbers.length; i++) {
                 System.out.print(numbers[i] + " ");
@@ -348,7 +345,6 @@ public class Main extends SimModelImpl {
             System.out.println();
         }
         double max = Arrays.stream(numbers).max().getAsDouble();
-        //System.out.println("max" + max);
         agent.setUtility(max);
 
 
@@ -391,21 +387,11 @@ public class Main extends SimModelImpl {
 
         if (agent.getRace() == 1) {
             n = Math.pow(numeratorN / denominatorN, exponentN);
-            k = Math.pow(numeratorK / denominatorK, exponentK);
-            //System.out.println("native n:" +n + " k: " +k);
-            //System.out.println("exponentn" +exponentN);
-            //System.out.println("native n w/o exponent" + numeratorN / denominatorN);
-            //System.out.println("exponentk" +exponentK);
-            //System.out.println("native k w/o exponent" + numeratorK / denominatorK);
-
 
         } else {
             n = Math.pow((pE * numeratorN) / denominatorN, exponentN);
             k = Math.pow((pE * numeratorK) / denominatorK, exponentK);
         }
-        //System.out.println("race" + agent.getRace());
-
-
 
         double payoff = pE * x * Math.pow(averp* agent.getEmployees().size(), beta) * Math.pow(k, alpha) * Math.pow(n, beta) - agent.getEmployees().size() * wage - r * k;
 
@@ -446,10 +432,6 @@ public class Main extends SimModelImpl {
             double cEG;
             cEE = (budget * gammaE) / pE;
             cEG = (1 - gammaE) * budget;
-            //System.out.println("budget" + budget);
-            //System.out.println("cEE" + cEE);
-            //System.out.println("cEG" + cEG);
-            //System.out.println("gammaE" + gammaE);
             u = Math.pow(cEE, gammaE) * Math.pow(cEG, 1 - gammaE);
         }
         return u;
